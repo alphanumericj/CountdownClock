@@ -457,6 +457,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = CountdownClock;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "We use your Heart Rate Variability (HRV) to detect stress and send encouragement as your event approaches.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.chipmania.CountdownClock;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -488,6 +489,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = CountdownClock;
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "We use your Heart Rate Variability (HRV) to detect stress and send encouragement as your event approaches.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.chipmania.CountdownClock;
 				LD_RUNPATH_SEARCH_PATHS = (

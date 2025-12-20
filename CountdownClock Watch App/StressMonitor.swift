@@ -16,6 +16,8 @@ final class StressMonitor {
     ]
 
     private var hasRequestedAuth = false
+    private let lastNotificationDateKey = "LastNotificationDate"
+    private let cooldownInterval: TimeInterval = 2 * 60 * 60 // 2 hours
 
     func start() {
         // Request notifications first
@@ -26,11 +28,21 @@ final class StressMonitor {
             guard success else { return }
             HealthKitManager.shared.startObservingHRV(thresholdInMilliseconds: self.hrvThresholdMilliseconds) { [weak self] latest in
                 guard let self, let latest else { return }
-                if latest < self.hrvThresholdMilliseconds {
+                if latest < self.hrvThresholdMilliseconds, self.isOutsideCooldown() {
                     self.handleLowHRV(latest)
                 }
             }
         }
+    }
+
+    private func isOutsideCooldown() -> Bool {
+        // Use app group defaults to share across app/extension if needed
+        let defaults = UserDefaults(suiteName: "group.com.chipmania.CountdownClock") ?? .standard
+        if let lastDate = defaults.object(forKey: lastNotificationDateKey) as? Date {
+            return Date().timeIntervalSince(lastDate) >= cooldownInterval
+        }
+        // No prior notification recorded: allow
+        return true
     }
 
     private func handleLowHRV(_ latest: Double) {
@@ -40,6 +52,10 @@ final class StressMonitor {
         let timestamp = sharedDefaults?.double(forKey: "targetDate") ?? 0
         let targetDate = timestamp > 0 ? Date(timeIntervalSince1970: timestamp) : Date()
         let remaining = Self.formatRemaining(from: Date(), to: targetDate)
+
+        // Record the time of this notification so we enforce cooldown next time
+        let defaults = sharedDefaults ?? .standard
+        defaults.set(Date(), forKey: lastNotificationDateKey)
 
         Task {
             await NotificationManager.shared.scheduleEncouragement(
