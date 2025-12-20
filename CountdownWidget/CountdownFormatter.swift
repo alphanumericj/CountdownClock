@@ -16,11 +16,11 @@ func breakdownCountdown(from start: Date, to end: Date) -> [(String, Int)] {
         to: end
     )
     var parts: [(String, Int)] = []
-    if let y = components.year, y > 0 { parts.append(("Y", y)) }
-    if let M = components.month, M > 0 { parts.append((" M", M)) }
-    if let d = components.day, d > 0 { parts.append((" D", d)) }
-    if let h = components.hour, h > 0 { parts.append((" h", h)) }
-    if let m = components.minute, m > 0 { parts.append((" m", m)) }
+    if let y = components.year, y > 0 { parts.append(("Y ", y)) }
+    if let M = components.month, M > 0 { parts.append(("M ", M)) }
+    if let d = components.day, d > 0 { parts.append(("D ", d)) }
+    if let h = components.hour, h > 0 { parts.append(("h ", h)) }
+    if let m = components.minute, m > 0 { parts.append(("m", m)) }
     return parts
 }
 
