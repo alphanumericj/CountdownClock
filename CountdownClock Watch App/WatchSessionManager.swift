@@ -3,24 +3,19 @@ import WatchConnectivity
 import WidgetKit
 
 class WatchSessionManager: NSObject, WCSessionDelegate, ObservableObject {
-    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
-      //  <#code#>
-    }
-    
-    @Published var eventTitle: String = ""
-    @Published var targetDate: Date = Date()
-    
+    @Published var events: [Event] = []
+
+    private let appGroup = "group.com.chipmania.CountdownClock"
+    private let storageKey = "events.v1"
+
     override init() {
         super.init()
 
-        // Load any previously saved values from the App Group so they persist across launches
-        let shared = UserDefaults(suiteName: "group.com.chipmania.CountdownClock")
-        if let savedTitle = shared?.string(forKey: "eventTitle") {
-            eventTitle = savedTitle
-        }
-        let savedTimestamp = shared?.double(forKey: "targetDate") ?? 0
-        if savedTimestamp > 0 {
-            targetDate = Date(timeIntervalSince1970: savedTimestamp)
+        // Load previously saved events from the App Group so they persist across launches
+        let shared = UserDefaults(suiteName: appGroup)
+        if let data = shared?.data(forKey: storageKey),
+           let decoded = try? JSONDecoder().decode([Event].self, from: data) {
+            events = decoded
         }
 
         // Start WatchConnectivity session
@@ -32,34 +27,42 @@ class WatchSessionManager: NSObject, WCSessionDelegate, ObservableObject {
     }
 
     func session(_ session: WCSession,
-                 didReceiveApplicationContext applicationContext: [String : Any]) {
+                 activationDidCompleteWith activationState: WCSessionActivationState,
+                 error: (any Error)?) {}
 
-        if let title = applicationContext["eventTitle"] as? String,
-           let timestamp = applicationContext["targetDate"] as? TimeInterval {
-            let date = Date(timeIntervalSince1970: timestamp)
+    func session(_ session: WCSession,
+                 didReceiveApplicationContext applicationContext: [String: Any]) {
+        guard let data = applicationContext["eventsData"] as? Data,
+              let decoded = try? JSONDecoder().decode([Event].self, from: data) else { return }
 
-            DispatchQueue.main.async {
-                // Update UI state
-                self.eventTitle = title
-                self.targetDate = date
+        DispatchQueue.main.async {
+            self.events = decoded
 
-                // Persist into the shared App Group so the complication can read it
-                let shared = UserDefaults(suiteName: "group.com.chipmania.CountdownClock")
-                shared?.set(title, forKey: "eventTitle")
-                shared?.set(timestamp, forKey: "targetDate")
+            let shared = UserDefaults(suiteName: self.appGroup)
 
-                // Now that data is stored where the widget reads it, refresh timelines on the watch
-                WidgetCenter.shared.reloadAllTimelines()
+            // Persist full events array for next launch
+            shared?.set(data, forKey: self.storageKey)
 
-                print("Received context from phone: \(title), \(self.targetDate)")
+            // Write nominated event's title/date for the watch-face widget complication
+            if let nominated = decoded.first(where: { $0.isNominated }) {
+                shared?.set(nominated.title, forKey: "eventTitle")
+                shared?.set(nominated.targetDate.timeIntervalSince1970, forKey: "targetDate")
+            } else if let first = decoded.first {
+                shared?.set(first.title, forKey: "eventTitle")
+                shared?.set(first.targetDate.timeIntervalSince1970, forKey: "targetDate")
+            } else {
+                shared?.removeObject(forKey: "eventTitle")
+                shared?.removeObject(forKey: "targetDate")
             }
+
+            // Refresh watch face complications
+            WidgetCenter.shared.reloadAllTimelines()
+
+            print("Received \(decoded.count) events from phone")
         }
     }
-    
-    
+
     func sessionReachabilityDidChange(_ session: WCSession) {
         print("WCSession reachability changed: \(session.isReachable)")
     }
-    
-
 }

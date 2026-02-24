@@ -95,11 +95,7 @@ struct CountdownView: View {
             }
         }
         .sheet(isPresented: $showingSetup) {
-            CountdownClockSetupView { title, date in
-                UserDefaults.standard.set(title, forKey: "eventTitle")
-                UserDefaults.standard.set(date.timeIntervalSince1970, forKey: "targetDate")
-                PhoneSessionManager.shared.sendCountdownSettings(eventTitle: title, targetDate: date)
-                
+            CountdownClockSetupView { _, _ in
                 showingSetup = false
             }
         }

@@ -36,11 +36,8 @@ struct CountdownClockSetupView: View {
                 
                 // Notify parent view
                             onSave(eventTitle, targetDate)
-                            
-                            // Send to watch
-                            PhoneSessionManager.shared.sendCountdownSettings(eventTitle: eventTitle,
-                                                                            targetDate: targetDate)
-                WidgetCenter.shared.reloadAllTimelines() //??
+
+                WidgetCenter.shared.reloadAllTimelines()
                         }
 
             .buttonStyle(.borderedProminent)

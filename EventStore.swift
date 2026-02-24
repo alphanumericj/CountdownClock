@@ -58,9 +58,7 @@ final class EventStore: ObservableObject {
             let shared = UserDefaults(suiteName: appGroup)
             shared?.set(data, forKey: storageKey)
             shared?.synchronize()
-        } catch {
-            // Handle encoding error if desired
-        }
+        } catch {}
     }
 
     private func load() {
@@ -75,7 +73,7 @@ final class EventStore: ObservableObject {
 
     // MARK: - Watch/Widget Sync
     private func notifyWatchIfNeeded() {
-        // Write nominated event to the shared App Group for widgets
+        // Write nominated event to the shared App Group for the lock-screen/watch-face widget
         let shared = UserDefaults(suiteName: appGroup)
         if let nominated = nominatedEvent {
             shared?.set(nominated.title, forKey: "eventTitle")
@@ -87,13 +85,8 @@ final class EventStore: ObservableObject {
         shared?.synchronize()
         WidgetCenter.shared.reloadAllTimelines()
 
-        // Send to watch using existing PhoneSessionManager if present
-        #if canImport(SwiftUI)
-        PhoneSessionManager.shared.sendCountdownSettings(
-            eventTitle: nominatedEvent?.title ?? "",
-            targetDate: nominatedEvent?.targetDate ?? Date()
-        )
-        #endif
+        // Send ALL events to the watch app (so it can display all as tiles)
+        PhoneSessionManager.shared.sendEvents(events)
     }
 
     private func enforceSingleNomination(for id: UUID) {
@@ -109,7 +102,6 @@ final class EventStore: ObservableObject {
             return copy
         }
         if !found {
-            // Ensure at most one nomination
             if let first = events.first {
                 nominate(first.id)
             }
