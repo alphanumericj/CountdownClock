@@ -69,10 +69,16 @@ struct EventTileView: View {
 
     var hasArrived: Bool { now >= event.targetDate }
 
+    var tileColor: Color {
+        if hasArrived { return Color.green.opacity(0.25) }
+        if event.isNominated { return Color.blue.opacity(0.2) }
+        return Color.purple.opacity(0.2)
+    }
+
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 12)
-                .fill(hasArrived ? Color.green.opacity(0.25) : Color.blue.opacity(0.2))
+                .fill(tileColor)
 
             HStack {
                 VStack(alignment: .leading, spacing: 3) {
