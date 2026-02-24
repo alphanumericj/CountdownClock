@@ -70,9 +70,9 @@ struct EventTileView: View {
     var hasArrived: Bool { now >= event.targetDate }
 
     var tileColor: Color {
-        if hasArrived { return Color.green.opacity(0.25) }
-        if event.isNominated { return Color.blue.opacity(0.2) }
-        return Color.purple.opacity(0.2)
+        if hasArrived { return Color.green.opacity(0.45) }
+        if event.isNominated { return Color.blue.opacity(0.4) }
+        return Color.purple.opacity(0.4)
     }
 
     var body: some View {
