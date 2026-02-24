@@ -8,6 +8,37 @@
 import SwiftUI
 import WidgetKit
 
+
+class CountdownModel: ObservableObject {
+    @Published var now = Date()
+    @Published var eventReached = false   // <— NEW
+
+    private var didNotify = false
+    private let sessionManager: WatchSessionManager
+
+       init(sessionManager: WatchSessionManager) {
+           self.sessionManager = sessionManager
+       }
+    func update(date: Date, target: Date) {
+        if !didNotify && date >= target {
+            didNotify = true
+            eventReached = true
+
+            Task {
+                await NotificationManager.shared.scheduleEventArrivalNotification(
+                    eventTitle: sessionManager.eventTitle,
+                    fireDate: target
+                )
+            }
+        }
+    }
+    
+    func resetNotificationFlag() {
+            didNotify = false
+            eventReached = false
+        }
+}
+
 //struct ContentView: View {
  //   var body: some View {
  //       VStack {
@@ -21,9 +52,10 @@ import WidgetKit
 //}
 struct ContentView: View {
     @EnvironmentObject var sessionManager: WatchSessionManager
-       
+    
        var body: some View {
            CountdownView(
+            sessionManager: sessionManager,
                eventTitle: sessionManager.eventTitle.isEmpty
                    ? "No event set"
                    : sessionManager.eventTitle,
@@ -63,6 +95,7 @@ struct CountdownProvider: TimelineProvider {
         
         for minuteOffset in 0..<60*24*7 {
             let entryDate = Calendar.current.date(byAdding: .minute, value: minuteOffset, to: currentDate)!
+            
             let entry = CountdownEntry(date: entryDate, eventTitle: title, targetDate: targetDate)
             entries.append(entry)
         }
@@ -72,38 +105,126 @@ struct CountdownProvider: TimelineProvider {
 }
 
 
-
 struct CountdownView: View {
+    let sessionManager: WatchSessionManager
+    @StateObject private var model: CountdownModel
+    @State private var showConfetti = false
+    
     let eventTitle: String
     let targetDate: Date
 
-    // This holds the current time and updates every second
-    @State private var now = Date()
-    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    init(sessionManager: WatchSessionManager, eventTitle: String, targetDate: Date) {
+        self.sessionManager = sessionManager
+        self.eventTitle = eventTitle
+        self.targetDate = targetDate
 
-    var body: some View {
-        VStack(alignment: .leading) {
-            Text("\(eventTitle) in:")
-                .font(.caption)
-
-            Text(formatCountdown(from: now, to: targetDate))
-                .font(.body)
-        }
-        .onReceive(timer) { date in
-            // Update the "now" value every second
-            now = date
-        }
+        _model = StateObject(wrappedValue: CountdownModel(sessionManager: sessionManager))
     }
 
-    private func formatCountdown(from start: Date, to end: Date) -> String {
-        let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: start, to: end)
 
-        if let years = components.year, years > 0 {
-            return "\(years)y \(components.month ?? 0)M \(components.day ?? 0)d \(components.hour ?? 0)h \(components.minute ?? 0)m \(components.second ?? 0)s"
-        } else if let months = components.month, months > 0 {
-            return "\(months)M \(components.day ?? 0)d \(components.hour ?? 0)h \(components.minute ?? 0)m \(components.second ?? 0)s"
+
+    //private let timer = Timer.publish(every: 20, on: .main, in: .common).autoconnect()
+    private var timer: Timer.TimerPublisher {
+        if Date() < targetDate {
+            return Timer.publish(every: 20, on: .main, in: .common)
         } else {
-            return "\(components.day ?? 0)d \(components.hour ?? 0)h\(components.minute ?? 0)m \(components.second ?? 0)s"
+            return Timer.publish(every: 1, on: .main, in: .common)
+        }
+    }
+    
+    var body: some View {
+        ZStack {
+            VStack(alignment: .leading) {
+                Text("\(eventTitle) ")
+                    .font(.caption)
+            
+                if eventTitle != "No event set" && Date() < targetDate {
+                    Text(formatCountdown(from: Date(), to: targetDate))
+                        .font(.body)
+                }
+                else if eventTitle != "No event set" && Date() >= targetDate {
+                    Text("🎉 Arrived! 🎉")
+                        .font(.body)
+                }
+            }
+
+            if Date() >= targetDate {
+                ConfettiView()   // <— your animation
+            }
+        }
+        .onReceive(timer.autoconnect()) { date in
+            model.update(date: date, target: targetDate)
+        
+        }
+        .onChange(of: sessionManager.eventTitle) {
+            model.resetNotificationFlag()
+        }
+        
+        .onChange(of: sessionManager.targetDate) {
+            model.resetNotificationFlag()
+        
+        }
+        /*
+        .onAppear { //Just always trigger confetti, why not
+            
+                triggerConfetti()
+                
+        }
+         */
+        .onDisappear{
+            //showConfetti = false
+        }
+    }
+    
+    private func triggerConfetti() {
+        withAnimation {
+            showConfetti = true
+        }
+/*
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            withAnimation {
+               showConfetti = false
+            }
+        }
+ */
+    }
+    
+    private func unit(_ value: Int, _ singular: String, _ plural: String) -> String {
+        value == 1 ? singular : plural
+    }
+    
+    private func formatCountdown(from start: Date, to end: Date) -> String {
+        if start >= end {
+            return "happening now!"
+        }
+
+        let comps = Calendar.current.dateComponents(
+            [.year, .month, .day, .hour, .minute, .second],
+            from: start,
+            to: end
+        )
+
+        if let years = comps.year, years > 0 {
+            let months = comps.month ?? 0
+            return "in: \(years) \(unit(years, "year", "years")) \(months) \(unit(months, "month", "months"))"
+        }
+        else if let months = comps.month, months > 0 {
+            let days = comps.day ?? 0
+            return "in: \(months) \(unit(months, "month", "months")) \(days) \(unit(days, "day", "days"))"
+        }
+        else if let days = comps.day, days > 0 {
+            let hours = comps.hour ?? 0
+            let minutes = comps.minute ?? 0
+            let seconds = comps.second ?? 0
+            return "in: \(days) \(unit(days, "day", "days")) \(hours) \(unit(hours, "hour", "hours")) \(minutes)m \(seconds)s"
+        }
+        else if let hours = comps.hour, hours > 0 {
+            let minutes = comps.minute ?? 0
+            return "in: \(hours) \(unit(hours, "hour", "hours")) \(minutes) \(unit(minutes, "minute", "minutes"))"
+        }
+        else {
+            let minutes = comps.minute ?? 0
+            return "in: \(minutes) \(unit(minutes, "minute", "minutes"))"
         }
     }
 }

@@ -14,7 +14,7 @@ struct EventEditorView: View {
                     DatePicker("Target date", selection: $event.targetDate, displayedComponents: [.date, .hourAndMinute])
                 }
                 Section {
-                    Toggle("Nominate for Watch", isOn: $event.isNominated)
+                    Toggle("Show on Watch", isOn: $event.isNominated)
                         .onChange(of: event.isNominated) { _, newValue in
                             if newValue { onNominate(event.id) }
                         }

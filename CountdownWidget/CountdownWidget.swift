@@ -1,120 +1,84 @@
+
 import WidgetKit
 import SwiftUI
-
-// MARK: - Short Countdown Formatting (for small complications)
-private func shortCountdownComponents(from now: Date, to target: Date) -> [(String, Int)] {
-    let cal = Calendar.current
-    let start = min(now, target)
-    let end = max(now, target)
-    let comps = cal.dateComponents([.year, .month, .day, .hour, .minute, .second], from: start, to: end)
-    var units: [(String, Int)] = []
-    if let y = comps.year, y > 0 { units.append(("Y", y)) }
-    if let m = comps.month, m > 0 { units.append(("M", m)) }
-    if let d = comps.day, d > 0 { units.append(("D", d)) }
-    if let h = comps.hour, h > 0 { units.append(("h", h)) }
-    if let min = comps.minute, min > 0 { units.append(("m", min)) }
-    if let s = comps.second, s > 0 { units.append(("s", s)) }
-    return units
-}
-
-private func formattedShortCountdown(now: Date, to target: Date) -> String {
-    var units = shortCountdownComponents(from: now, to: target)
-    if units.isEmpty { return "0s" }
-    // Short form: up to 2 leading nonzero units
-    units = Array(units.prefix(2))
-    return units.map { "\($0.1)\($0.0)" }.joined(separator: " ")
-}
 
 // MARK: - Timeline Entry
 struct CountdownEntry: TimelineEntry {
     let date: Date
     let eventTitle: String
     let targetDate: Date
+    let hasEvent: Bool
 }
 
 // MARK: - Timeline Provider
 struct CountdownProvider: TimelineProvider {
+
     func placeholder(in context: Context) -> CountdownEntry {
         CountdownEntry(
             date: Date(),
-            eventTitle: "Midterms",
-            targetDate: Date().addingTimeInterval(3600)
+            eventTitle: "Sample Event",
+            targetDate: Date().addingTimeInterval(3600),
+            hasEvent: true
         )
     }
 
     func getSnapshot(in context: Context, completion: @escaping (CountdownEntry) -> Void) {
         let sharedDefaults = UserDefaults(suiteName: "group.com.chipmania.CountdownClock")
-        let title = sharedDefaults?.string(forKey: "eventTitle") ?? "*No event"
+
+        let title = sharedDefaults?.string(forKey: "eventTitle")
         let timestamp = sharedDefaults?.double(forKey: "targetDate") ?? 0
+
+        let hasEvent = (title != nil && timestamp > 0)
+        let eventTitle = title ?? "------"
         let targetDate = timestamp > 0 ? Date(timeIntervalSince1970: timestamp) : Date()
-        completion(CountdownEntry(date: Date(), eventTitle: title, targetDate: targetDate))
+
+        completion(
+            CountdownEntry(
+                date: Date(),
+                eventTitle: eventTitle,
+                targetDate: targetDate,
+                hasEvent: hasEvent
+            )
+        )
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<CountdownEntry>) -> Void) {
-        let currentDate = Date()
+
+        let now = Date()
         let sharedDefaults = UserDefaults(suiteName: "group.com.chipmania.CountdownClock")
-        let title = sharedDefaults?.string(forKey: "eventTitle") ?? "------"
+
+        let title = sharedDefaults?.string(forKey: "eventTitle")
         let timestamp = sharedDefaults?.double(forKey: "targetDate") ?? 0
-        let targetDate = timestamp > 0 ? Date(timeIntervalSince1970: timestamp) : currentDate
 
-        let entry = CountdownEntry(date: currentDate, eventTitle: title, targetDate: targetDate)
-        // Request a refresh roughly every minute to pick up data changes. The timer style handles ticking.
-        let timeline = Timeline(entries: [entry], policy: .after(currentDate.addingTimeInterval(60)))
+        let hasEvent = (title != nil && timestamp > 0)
+        let eventTitle = title ?? "------"
+        let targetDate = timestamp > 0 ? Date(timeIntervalSince1970: timestamp) : now
+
+        // Entry for "now"
+        let entryNow = CountdownEntry(
+            date: now,
+            eventTitle: eventTitle,
+            targetDate: targetDate,
+            hasEvent: hasEvent
+        )
+
+        // Entry for the exact arrival moment
+        let entryArrival = CountdownEntry(
+            date: targetDate,
+            eventTitle: eventTitle,
+            targetDate: targetDate,
+            hasEvent: hasEvent
+        )
+
+        // After arrival, refresh again 1 minute later
+        let refresh = max(now, targetDate).addingTimeInterval(60)
+
+        let timeline = Timeline(
+            entries: [entryNow, entryArrival],
+            policy: .after(refresh)
+        )
+
         completion(timeline)
-    }
-}
-
-// MARK: - Complication Views using live-updating timer style
-struct CountdownCircularView: View {
-    var entry: CountdownEntry
-    var body: some View {
-        if entry.eventTitle == "------" {
-            Text("---")
-                .font(.caption2)
-                .containerBackground(Color.clear, for: .widget)
-        } else {
-            // Live-updating countdown using short format
-            Text(formattedShortCountdown(now: entry.date, to: entry.targetDate))
-                .font(.caption2)
-                .containerBackground(Color.clear, for: .widget)
-        }
-    }
-}
-
-struct CountdownInlineView: View {
-    var entry: CountdownEntry
-    var body: some View {
-        if entry.eventTitle == "------" {
-            Text("---")
-                .font(.caption2)
-                .containerBackground(Color.clear, for: .widget)
-        } else {
-            // Live-updating countdown using short format
-            Text(formattedShortCountdown(now: entry.date, to: entry.targetDate))
-                .font(.caption2)
-                .containerBackground(Color.clear, for: .widget)
-        }
-    }
-}
-
-struct CountdownRectangularView: View {
-    var entry: CountdownEntry
-    var body: some View {
-        VStack(alignment: .leading) {
-            if entry.eventTitle == "------" {
-                Text("---")
-                    .font(.caption2)
-                    .containerBackground(Color.clear, for: .widget)
-            } else {
-                Text("\(entry.eventTitle) in:")
-                    .font(.caption2)
-                    .containerBackground(Color.clear, for: .widget)
-                // Live-updating countdown
-                Text(entry.targetDate, style: .timer)
-                    .font(.footnote)
-                    .containerBackground(Color.clear, for: .widget)
-            }
-        }
     }
 }
 
@@ -133,51 +97,86 @@ struct CountdownWidget: Widget {
     }
 }
 
+// MARK: - Complication View
 struct CountdownComplicationView: View {
     var entry: CountdownEntry
     @Environment(\.widgetFamily) var family
 
+    var arrived: Bool {
+        entry.hasEvent && entry.date >= entry.targetDate
+    }
+
     var body: some View {
         switch family {
+
+        // -------------------------
+        // CIRCULAR
+        // -------------------------
         case .accessoryCircular:
-            if entry.eventTitle == "------" {
+            if !entry.hasEvent {
                 Text("---")
                     .font(.caption2)
                     .containerBackground(Color.clear, for: .widget)
+
+            } else if arrived {
+                Text("0:00")
+                    .font(.caption2)
+                    .containerBackground(Color.clear, for: .widget)
+
             } else {
-                Text(formattedShortCountdown(now: entry.date, to: entry.targetDate))
+                Text(entry.targetDate, style: .timer)
                     .font(.caption2)
                     .containerBackground(Color.clear, for: .widget)
             }
 
+        // -------------------------
+        // INLINE
+        // -------------------------
         case .accessoryInline:
-            if entry.eventTitle == "------" {
+            if !entry.hasEvent {
                 Text("---")
                     .containerBackground(Color.clear, for: .widget)
+
+            } else if arrived {
+                Text("0:00")
+                    .containerBackground(Color.clear, for: .widget)
+
             } else {
-                Text(formattedShortCountdown(now: entry.date, to: entry.targetDate))
+                Text(entry.targetDate, style: .timer)
+                    .font(.footnote)
                     .containerBackground(Color.clear, for: .widget)
             }
 
+        // -------------------------
+        // RECTANGULAR
+        // -------------------------
         case .accessoryRectangular:
-            if entry.eventTitle == "------" {
+            if !entry.hasEvent {
                 VStack(alignment: .leading) {
                     Text("------")
                         .font(.caption2)
-                        .containerBackground(Color.clear, for: .widget)
                     Text("------")
                         .font(.footnote)
-                        .containerBackground(Color.clear, for: .widget)
                 }
+                .containerBackground(Color.clear, for: .widget)
+
+            } else if arrived {
+                VStack(alignment: .leading) {
+                    Text(entry.eventTitle)
+                        .font(.caption2)
+                    Text("Arrived!")
+                        .font(.footnote)
+                }
+                .containerBackground(Color.clear, for: .widget)
+
             } else {
                 VStack(alignment: .leading) {
                     Text("\(entry.eventTitle) in:")
                         .font(.caption2)
-                        .containerBackground(Color.clear, for: .widget)
                     Text(entry.targetDate, style: .timer)
                         .font(.footnote)
-                        .containerBackground(Color.clear, for: .widget)
                 }
+                .containerBackground(Color.clear, for: .widget)
             }
 
         default:
@@ -185,4 +184,3 @@ struct CountdownComplicationView: View {
         }
     }
 }
-

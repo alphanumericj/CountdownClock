@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		934F5A3B2F0332C2005823F6 /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934F5A3A2F0332C2005823F6 /* Event.swift */; };
+		934F5A3D2F0332CA005823F6 /* EventStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934F5A3C2F0332CA005823F6 /* EventStore.swift */; };
+		934F5A3F2F0332CB005823F6 /* EventEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934F5A3E2F0332CB005823F6 /* EventEditorView.swift */; };
+		934F5A412F0332D0005823F6 /* EventListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934F5A402F0332D0005823F6 /* EventListView.swift */; };
+		935E47B62F4D24FA0053BA9C /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934F5A3A2F0332C2005823F6 /* Event.swift */; };
+		935E47B72F4D24FA0053BA9C /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934F5A3A2F0332C2005823F6 /* Event.swift */; };
 		9386CE9D2EE3747B00511539 /* CountdownClock Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 9386CE9C2EE3747B00511539 /* CountdownClock Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		9386CEBA2EE385B100511539 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9386CEB92EE385B100511539 /* WidgetKit.framework */; };
 		9386CEBC2EE385B100511539 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9386CEBB2EE385B100511539 /* SwiftUI.framework */; };
@@ -56,6 +62,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		934F5A3A2F0332C2005823F6 /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
+		934F5A3C2F0332CA005823F6 /* EventStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventStore.swift; sourceTree = "<group>"; };
+		934F5A3E2F0332CB005823F6 /* EventEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventEditorView.swift; sourceTree = "<group>"; };
+		934F5A402F0332D0005823F6 /* EventListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventListView.swift; sourceTree = "<group>"; };
 		9386CE8C2EE3747A00511539 /* CountdownClock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CountdownClock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9386CE9C2EE3747B00511539 /* CountdownClock Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CountdownClock Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9386CEB72EE385B100511539 /* CountdownWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CountdownWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -131,6 +141,10 @@
 				9386CEBD2EE385B100511539 /* CountdownWidget */,
 				9386CEB82EE385B100511539 /* Frameworks */,
 				9386CE8D2EE3747A00511539 /* Products */,
+				934F5A3A2F0332C2005823F6 /* Event.swift */,
+				934F5A3C2F0332CA005823F6 /* EventStore.swift */,
+				934F5A3E2F0332CB005823F6 /* EventEditorView.swift */,
+				934F5A402F0332D0005823F6 /* EventListView.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -297,6 +311,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				934F5A3D2F0332CA005823F6 /* EventStore.swift in Sources */,
+				934F5A3B2F0332C2005823F6 /* Event.swift in Sources */,
+				934F5A3F2F0332CB005823F6 /* EventEditorView.swift in Sources */,
+				934F5A412F0332D0005823F6 /* EventListView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -304,6 +322,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				935E47B62F4D24FA0053BA9C /* Event.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -311,6 +330,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				935E47B72F4D24FA0053BA9C /* Event.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

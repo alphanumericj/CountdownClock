@@ -7,17 +7,35 @@
 		<key>CountdownClock Watch App.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>0</integer>
+			<integer>2</integer>
 		</dict>
 		<key>CountdownClock.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>1</integer>
+			<integer>0</integer>
 		</dict>
 		<key>CountdownWidgetExtension.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>2</integer>
+			<integer>1</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>9386CE8B2EE3747A00511539</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>9386CE9B2EE3747B00511539</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>9386CEB62EE385B100511539</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>

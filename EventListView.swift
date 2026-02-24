@@ -22,7 +22,7 @@ struct EventListView: View {
                             }
                             Spacer()
                             if event.isNominated {
-                                Label("Nominated", systemImage: "applewatch")
+                                Label("Shown on Watch", systemImage: "applewatch")
                                     .font(.caption)
                                     .foregroundStyle(.tint)
                             }
@@ -32,7 +32,7 @@ struct EventListView: View {
                         Button {
                             store.nominate(event.id)
                         } label: {
-                            Label("Nominate for Watch", systemImage: "applewatch")
+                            Label("Show on Watch", systemImage: "applewatch")
                         }
                     }
                 }
