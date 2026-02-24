@@ -79,7 +79,7 @@ struct EventTileView: View {
                     Text(event.title)
                         .font(.caption2)
                         .foregroundStyle(.secondary)
-                        .lineLimit(1)
+                        .fixedSize(horizontal: false, vertical: true)
 
                     if hasArrived {
                         Text("🎉 Arrived!")
