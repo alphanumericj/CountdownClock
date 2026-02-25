@@ -21,23 +21,29 @@ struct ConfettiView: View {
                     .position(x: particle.x, y: particle.y)
                     .rotationEffect(.degrees(particle.rotation))
                     .opacity(particle.opacity)
-                    .animation(.easeOut(duration: 1.2), value: particle)
             }
         }
+        // Fill the tile so .position() coordinates are meaningful
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear {
             launchConfetti()
         }
     }
 
     private func launchConfetti() {
+        // First render: place particles at starting positions (opacity 1)
         particles = (0..<20).map { _ in ConfettiParticle.random() }
 
-        // Animate downward fall
-        withAnimation(.easeOut(duration: 1.2)) {
-            for index in particles.indices {
-                particles[index].y += 120   // fall distance
-                particles[index].rotation += Double.random(in: 90...360)
-                particles[index].opacity = 0
+        // Yield to the next render cycle so SwiftUI sees the starting state,
+        // then animate to the final state — without this the whole thing is
+        // batched into one frame and nothing appears to move.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            withAnimation(.easeOut(duration: 1.5)) {
+                for index in particles.indices {
+                    particles[index].y += 150
+                    particles[index].rotation += Double.random(in: 90...360)
+                    particles[index].opacity = 0
+                }
             }
         }
     }

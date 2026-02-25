@@ -17,6 +17,10 @@ final class NotificationManager {
         content.title = "WooHoo!!"
         content.body = "\(eventTitle) is here!"
         content.sound = .default
+        // Category triggers the custom notification interface on the watch
+        content.categoryIdentifier = "arrival"
+        // Pass event title so NotificationController can display it in the custom view
+        content.userInfo = ["eventTitle": eventTitle]
 
         // Fire immediately — by the time we detect arrival the target date is already past
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)

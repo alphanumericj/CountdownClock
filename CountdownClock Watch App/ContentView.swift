@@ -67,8 +67,6 @@ struct EventTileView: View {
     let hasNotified: Bool
     let onNotify: () -> Void
 
-    @State private var showConfetti = false
-
     var hasArrived: Bool { now >= event.targetDate }
 
     var tileColor: Color {
@@ -103,35 +101,23 @@ struct EventTileView: View {
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 8)
-
-            if showConfetti {
-                ConfettiView()
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-            }
         }
         .onAppear {
-            // Handle events that have already arrived when the app opens
-            if hasArrived {
-                showConfetti = true
-                guard !hasNotified else { return }
-                onNotify()
-                Task {
-                    await NotificationManager.shared.scheduleEventArrivalNotification(
-                        eventTitle: event.title
-                    )
-                }
+            guard hasArrived, !hasNotified else { return }
+            onNotify()
+            Task {
+                await NotificationManager.shared.scheduleEventArrivalNotification(
+                    eventTitle: event.title
+                )
             }
         }
         .onChange(of: hasArrived) { _, arrived in
-            if arrived {
-                showConfetti = true
-                guard !hasNotified else { return }
-                onNotify()
-                Task {
-                    await NotificationManager.shared.scheduleEventArrivalNotification(
-                        eventTitle: event.title
-                    )
-                }
+            guard arrived, !hasNotified else { return }
+            onNotify()
+            Task {
+                await NotificationManager.shared.scheduleEventArrivalNotification(
+                    eventTitle: event.title
+                )
             }
         }
     }
