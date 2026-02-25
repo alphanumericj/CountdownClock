@@ -51,9 +51,11 @@ struct ContentView: View {
             now = date
         }
         .onChange(of: sessionManager.events) {
-            // Clear notification tracking for events that no longer exist
+            // Keep a notified ID only if the event still exists AND has already arrived.
+            // If the event was rescheduled to the future, drop it so it can notify again.
             notifiedIDs = notifiedIDs.filter { id in
-                sessionManager.events.contains { $0.id == id }
+                guard let event = sessionManager.events.first(where: { $0.id == id }) else { return false }
+                return Date() >= event.targetDate
             }
         }
     }
