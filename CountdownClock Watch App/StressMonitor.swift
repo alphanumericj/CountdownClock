@@ -12,6 +12,9 @@ final class StressMonitor {
         "Hang in there.",
         "Breathe in, breathe out.",
         "Look on the bright side",
+        "Keep calm and carry on!",
+        "One moment at a time.",
+        "Something to look forward to!",
         "Keep going, it's closer than you think."
     ]
 
@@ -46,22 +49,43 @@ final class StressMonitor {
     }
 
     private func handleLowHRV(_ latest: Double) {
-        
-        // Read event + target from app group to compose message
         let sharedDefaults = UserDefaults(suiteName: "group.com.chipmania.CountdownClock")
-        let title = sharedDefaults?.string(forKey: "eventTitle") ?? "Your event"
-        let timestamp = sharedDefaults?.double(forKey: "targetDate") ?? 0
-        let targetDate = timestamp > 0 ? Date(timeIntervalSince1970: timestamp) : Date()
-        if Date() > targetDate { return } 
-        let remaining = Self.formatRemaining(from: Date(), to: targetDate)
+        let now = Date()
+
+        // Pick a random event from the three soonest upcoming events.
+        // Falls back to the legacy single-event keys if the full array isn't available yet.
+        let chosenTitle: String
+        let chosenTargetDate: Date
+
+        if let data = sharedDefaults?.data(forKey: "events.v1"),
+           let allEvents = try? JSONDecoder().decode([Event].self, from: data) {
+            // Filter to future events, sort ascending, take up to 3, pick one at random
+            let upcoming = allEvents
+                .filter { $0.targetDate > now }
+                .sorted { $0.targetDate < $1.targetDate }
+                .prefix(3)
+            guard let chosen = upcoming.randomElement() else { return }
+            chosenTitle = chosen.title
+            chosenTargetDate = chosen.targetDate
+        } else {
+            // Fallback: use the nominated event written by WatchSessionManager
+            let title = sharedDefaults?.string(forKey: "eventTitle") ?? "Your event"
+            let timestamp = sharedDefaults?.double(forKey: "targetDate") ?? 0
+            let targetDate = timestamp > 0 ? Date(timeIntervalSince1970: timestamp) : now
+            guard now < targetDate else { return }
+            chosenTitle = title
+            chosenTargetDate = targetDate
+        }
+
+        let remaining = Self.formatRemaining(from: now, to: chosenTargetDate)
 
         // Record the time of this notification so we enforce cooldown next time
         let defaults = sharedDefaults ?? .standard
-        defaults.set(Date(), forKey: lastNotificationDateKey)
+        defaults.set(now, forKey: lastNotificationDateKey)
 
         Task {
             await NotificationManager.shared.scheduleEncouragement(
-                eventTitle: title,
+                eventTitle: chosenTitle,
                 timeRemaining: remaining,
                 messages: encouragingMessages
             )
