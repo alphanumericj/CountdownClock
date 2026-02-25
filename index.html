@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iCountdownClock — Count Down to What Matters</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --blue: #0A84FF;
+            --green: #30D158;
+            --purple: #BF5AF2;
+            --bg: #000000;
+            --surface: #1C1C1E;
+            --surface2: #2C2C2E;
+            --text: #FFFFFF;
+            --text-secondary: #AEAEB2;
+            --border: #38383A;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* HERO */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 60px 24px;
+            background: radial-gradient(ellipse at 50% 0%, rgba(10, 132, 255, 0.15) 0%, transparent 70%);
+            position: relative;
+        }
+
+        .app-icon {
+            width: 120px;
+            height: 120px;
+            border-radius: 26px;
+            margin-bottom: 32px;
+            box-shadow: 0 20px 60px rgba(10, 132, 255, 0.4);
+        }
+
+        .hero h1 {
+            font-size: clamp(42px, 8vw, 72px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #fff 40%, #0A84FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero .tagline {
+            font-size: clamp(18px, 3vw, 24px);
+            color: var(--text-secondary);
+            max-width: 560px;
+            margin-bottom: 48px;
+            font-weight: 400;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 10px 20px;
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .badge .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--blue);
+            color: white;
+            text-decoration: none;
+            padding: 16px 36px;
+            border-radius: 999px;
+            font-size: 17px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            margin-top: 16px;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        .cta-button:hover {
+            opacity: 0.85;
+            transform: translateY(-2px);
+        }
+
+        /* WATCH MOCKUP */
+        .watch-section {
+            padding: 100px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .section-label {
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--blue);
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            text-align: center;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .section-title span {
+            color: var(--blue);
+        }
+
+        .section-body {
+            font-size: 17px;
+            color: var(--text-secondary);
+            max-width: 540px;
+            text-align: center;
+            line-height: 1.7;
+        }
+
+        /* WATCH FACE MOCKUP */
+        .watch-mockup {
+            position: relative;
+            width: 200px;
+            height: 240px;
+            background: #1a1a1a;
+            border-radius: 52px;
+            border: 4px solid #3a3a3a;
+            box-shadow:
+                0 0 0 2px #555,
+                0 40px 80px rgba(0,0,0,0.6),
+                0 0 60px rgba(10,132,255,0.2);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .watch-screen {
+            width: 100%;
+            height: 100%;
+            padding: 14px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow: hidden;
+        }
+
+        .tile {
+            border-radius: 12px;
+            padding: 10px 12px;
+        }
+
+        .tile-blue   { background: rgba(10, 132, 255, 0.4); }
+        .tile-purple { background: rgba(191, 90, 242, 0.4); }
+        .tile-green  { background: rgba(48, 209, 88, 0.45); }
+
+        .tile-label {
+            font-size: 9px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 2px;
+        }
+
+        .tile-value {
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+            letter-spacing: -0.02em;
+        }
+
+        /* TILES FEATURE */
+        .tiles-feature {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 60px;
+            max-width: 960px;
+            width: 100%;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tiles-feature .copy {
+            flex: 1;
+            min-width: 260px;
+            max-width: 440px;
+        }
+
+        .tiles-feature .copy h2 {
+            font-size: clamp(26px, 4vw, 40px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+            line-height: 1.1;
+        }
+
+        .tiles-feature .copy p {
+            font-size: 17px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* FEATURES GRID */
+        .features {
+            padding: 80px 24px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .features-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px;
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 16px;
+        }
+
+        .feature-card h3 {
+            font-size: 19px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            letter-spacing: -0.02em;
+        }
+
+        .feature-card p {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.65;
+        }
+
+        /* HRV SECTION */
+        .hrv-section {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 100px 24px;
+        }
+
+        .hrv-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        @media (max-width: 640px) {
+            .hrv-inner { grid-template-columns: 1fr; }
+            .tiles-feature { flex-direction: column; }
+        }
+
+        .hrv-side {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px;
+        }
+
+        .hrv-side.them {
+            border-color: #3a2020;
+            background: #1e1010;
+        }
+
+        .hrv-side.us {
+            border-color: #1a3a2a;
+            background: #0e1e16;
+        }
+
+        .hrv-side-label {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .hrv-side.them .hrv-side-label {
+            background: rgba(255, 69, 58, 0.2);
+            color: #FF453A;
+        }
+
+        .hrv-side.us .hrv-side-label {
+            background: rgba(48, 209, 88, 0.2);
+            color: var(--green);
+        }
+
+        .hrv-side h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .hrv-side p {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .notification-mockup {
+            margin-top: 20px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 14px;
+            padding: 14px 16px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .notification-mockup .notif-app {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .notification-mockup.bad { border-left: 3px solid #FF453A; }
+        .notification-mockup.good { border-left: 3px solid var(--green); }
+
+        /* COLOR KEY */
+        .color-key {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .color-key-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+
+        .swatch {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+        }
+
+        .swatch-blue   { background: rgba(10, 132, 255, 0.5); border: 1px solid rgba(10,132,255,0.6); }
+        .swatch-purple { background: rgba(191, 90, 242, 0.5); border: 1px solid rgba(191,90,242,0.6); }
+        .swatch-green  { background: rgba(48, 209, 88, 0.5);  border: 1px solid rgba(48,209,88,0.6); }
+
+        /* FOOTER */
+        footer {
+            padding: 60px 24px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+            border-top: 1px solid var(--border);
+        }
+
+        footer .footer-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        /* DIVIDER */
+        .divider {
+            width: 60px;
+            height: 3px;
+            background: var(--blue);
+            border-radius: 2px;
+            margin: 20px auto 0;
+        }
+    </style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="badge"><span class="dot"></span> For iPhone &amp; Apple Watch</div>
+    <img src="cd.png" class="app-icon" alt="iCountdownClock icon">
+    <h1>iCountdownClock</h1>
+    <p class="tagline">Count down to the moments that matter most — right on your wrist.</p>
+    <a href="#" class="cta-button">Download on the App Store</a>
+</section>
+
+<!-- WATCH TILES FEATURE -->
+<section class="watch-section">
+
+    <div>
+        <p class="section-label" style="text-align:center">Apple Watch App</p>
+        <h2 class="section-title">All your events, <span>at a glance</span></h2>
+        <div class="divider"></div>
+    </div>
+
+    <div class="tiles-feature">
+        <div class="watch-mockup">
+            <div class="watch-screen">
+                <div class="tile tile-blue">
+                    <div class="tile-label">Summer Vacation ★</div>
+                    <div class="tile-value">45d 3h</div>
+                </div>
+                <div class="tile tile-purple">
+                    <div class="tile-label">Eye Appointment</div>
+                    <div class="tile-value">12d 6h</div>
+                </div>
+                <div class="tile tile-green">
+                    <div class="tile-label">Birthday Party</div>
+                    <div class="tile-value">🎉 Arrived!</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="copy">
+            <h2>Your events as scrollable tiles</h2>
+            <p>Set up all your upcoming events on your iPhone, then scroll through them on your Apple Watch. Every countdown you care about, always within reach.</p>
+            <div class="color-key" style="justify-content:flex-start; margin-top:24px;">
+                <div class="color-key-item"><div class="swatch swatch-blue"></div> Watch face event</div>
+                <div class="color-key-item"><div class="swatch swatch-purple"></div> Upcoming</div>
+                <div class="color-key-item"><div class="swatch swatch-green"></div> Arrived!</div>
+            </div>
+        </div>
+    </div>
+
+    <p class="section-body">Pin your most important event to your watch face as a complication — so the countdown is always visible without even opening the app.</p>
+
+</section>
+
+<!-- FEATURES GRID -->
+<section class="features">
+    <div class="features-header">
+        <p class="section-label">Everything you need</p>
+        <h2 class="section-title">Simple. Powerful. <span style="color:var(--blue)">Personal.</span></h2>
+    </div>
+
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">📅</div>
+            <h3>Multiple Events</h3>
+            <p>Track as many countdowns as you like — vacations, appointments, launches, birthdays. Add, edit, and remove them in seconds on your iPhone.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">⌚</div>
+            <h3>Watch Face Widget</h3>
+            <p>Pin your chosen event as a watch face complication. The countdown updates right on your watch face so you never have to open the app.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🎉</div>
+            <h3>Arrival Celebration</h3>
+            <p>When your moment finally arrives, the app celebrates with you — confetti animation and a notification.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">❤️</div>
+            <h3>Heart Rate Variability</h3>
+            <p>Uses your Apple Watch's HRV sensor to detect stress in the background — no extra hardware, no extra steps.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔄</div>
+            <h3>Live Sync</h3>
+            <p>Changes you make on your iPhone appear instantly on your watch. Everything stays in sync automatically.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3>Completely Private</h3>
+            <p>All data lives on your device and is shared only between your iPhone and Apple Watch. Nothing is sent to any server.</p>
+        </div>
+    </div>
+</section>
+
+<!-- HRV / STRESS SECTION -->
+<section class="hrv-section">
+    <div style="text-align:center; margin-bottom:56px;">
+        <p class="section-label">Stress Detection</p>
+        <h2 class="section-title">Not another app that <span style="color:#FF453A">tells you you're stressed</span></h2>
+        <p class="section-body" style="margin: 16px auto 0;">Most wellness apps detect low HRV and respond by reminding you that you are, in fact, stressed — which is not exactly helpful. iCountdownClock does something different.</p>
+    </div>
+
+    <div class="hrv-inner">
+        <div class="hrv-side them">
+            <div class="hrv-side-label">Other apps</div>
+            <h3>Stress detected. You are stressed.</h3>
+            <p>When HRV drops, most apps fire off an alert telling you your stress levels are elevated — adding to the very anxiety they claim to address.</p>
+            <div class="notification-mockup bad">
+                <div class="notif-app">Wellness App</div>
+                <strong>High Stress Detected</strong><br>
+                Your Heart Rate Variability is low. You may be experiencing elevated stress.
+            </div>
+        </div>
+
+        <div class="hrv-side us">
+            <div class="hrv-side-label">iCountdownClock</div>
+            <h3>Stress detected. Here's something to smile about.</h3>
+            <p>When your HRV dips, iCountdownClock gently reminds you of what you're looking forward to — turning a stressful moment into a reason for optimism.</p>
+            <div class="notification-mockup good">
+                <div class="notif-app">iCountdownClock</div>
+                <strong>Take a breath. ✨</strong><br>
+                Summer Vacation is only 45 days away. You've got this.
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-title">iCountdownClock</div>
+    <p>For iPhone and Apple Watch &nbsp;·&nbsp; Requires iOS 17 and watchOS 10</p>
+    <p style="margin-top: 12px;">© 2026 Laure Chipman. All rights reserved.</p>
+</footer>
+
+</body>
+</html>
