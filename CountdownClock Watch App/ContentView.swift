@@ -107,6 +107,19 @@ struct EventTileView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }
         }
+        .onAppear {
+            // Handle events that have already arrived when the app opens
+            if hasArrived {
+                showConfetti = true
+                guard !hasNotified else { return }
+                onNotify()
+                Task {
+                    await NotificationManager.shared.scheduleEventArrivalNotification(
+                        eventTitle: event.title
+                    )
+                }
+            }
+        }
         .onChange(of: hasArrived) { _, arrived in
             if arrived {
                 showConfetti = true
@@ -114,8 +127,7 @@ struct EventTileView: View {
                 onNotify()
                 Task {
                     await NotificationManager.shared.scheduleEventArrivalNotification(
-                        eventTitle: event.title,
-                        fireDate: event.targetDate
+                        eventTitle: event.title
                     )
                 }
             }

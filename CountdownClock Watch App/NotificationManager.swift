@@ -10,32 +10,21 @@ final class NotificationManager {
         if !granted { throw NSError(domain: "Notification", code: 1, userInfo: [NSLocalizedDescriptionKey: "Notifications not authorized"]) }
     }
 
-    func scheduleEventArrivalNotification(eventTitle: String, fireDate: Date) async {
-            let center = UNUserNotificationCenter.current()
-                        
-            let body = "\(eventTitle) now!"
-            
-            let content = UNMutableNotificationContent()
-            content.title = "WooHoo!!"
-            content.body = body
-            content.sound = .default
-            
-            // Trigger immediately
-            //let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
-        let trigger = UNCalendarNotificationTrigger(
-                dateMatching: Calendar.current.dateComponents(
-                    [.year, .month, .day, .hour, .minute, .second],
-                    from: fireDate
-                ),
-                repeats: false
-            )
-            let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
-            do {
-                try await center.add(request)
-            } catch {
-                // Silently ignore errors in scheduling
-            }
-        }
+    func scheduleEventArrivalNotification(eventTitle: String) async {
+        let center = UNUserNotificationCenter.current()
+
+        let content = UNMutableNotificationContent()
+        content.title = "WooHoo!!"
+        content.body = "\(eventTitle) is here!"
+        content.sound = .default
+
+        // Fire immediately — by the time we detect arrival the target date is already past
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+        do {
+            try await center.add(request)
+        } catch {}
+    }
         
     func scheduleEncouragement(eventTitle: String, timeRemaining: String, messages: [String]) async {
         let center = UNUserNotificationCenter.current()
