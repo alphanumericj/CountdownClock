@@ -31,18 +31,33 @@ struct ConfettiView: View {
     }
 
     private func launchConfetti() {
-        // First render: place particles at starting positions (opacity 1)
-        particles = (0..<20).map { _ in ConfettiParticle.random() }
+        // Fire an immediate burst and a follow-up burst 3 s later.
+        // The follow-up is a safety net: the notification interface is
+        // pre-rendered before it becomes visible, so the first burst might
+        // start (and even finish) before the user ever sees the screen.
+        // Having a second burst ensures at least one is seen.
+        launchBurst()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            launchBurst()
+        }
+    }
 
-        // Yield to the next render cycle so SwiftUI sees the starting state,
-        // then animate to the final state — without this the whole thing is
-        // batched into one frame and nothing appears to move.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-            withAnimation(.easeOut(duration: 1.5)) {
-                for index in particles.indices {
-                    particles[index].y += 150
-                    particles[index].rotation += Double.random(in: 90...360)
-                    particles[index].opacity = 0
+    private func launchBurst() {
+        // Delay particle creation by 0.4 s so they don't appear until the
+        // notification view has had time to transition onto the screen.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            particles = (0..<20).map { _ in ConfettiParticle.random() }
+
+            // Yield one render cycle so SwiftUI records the starting positions
+            // before the animation begins — otherwise creation and movement are
+            // batched into a single frame and nothing appears to move.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                withAnimation(.easeOut(duration: 2.0)) {
+                    for index in particles.indices {
+                        particles[index].y += 150
+                        particles[index].rotation += Double.random(in: 90...360)
+                        particles[index].opacity = 0
+                    }
                 }
             }
         }

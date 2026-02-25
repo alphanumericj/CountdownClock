@@ -4,7 +4,6 @@ import SwiftUI
 /// Displayed by NotificationController for the "arrival" category.
 struct NotificationView: View {
     let eventTitle: String
-    @State private var showConfetti = false
 
     var body: some View {
         ZStack {
@@ -23,12 +22,9 @@ struct NotificationView: View {
                     .multilineTextAlignment(.center)
             }
 
-            if showConfetti {
-                ConfettiView()
-            }
-        }
-        .onAppear {
-            showConfetti = true
+            // Always present so its onAppear fires as soon as this view appears,
+            // without waiting for a second render cycle to insert it conditionally.
+            ConfettiView()
         }
     }
 }
