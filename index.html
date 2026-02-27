@@ -393,6 +393,92 @@
         .swatch-purple { background: rgba(191, 90, 242, 0.5); border: 1px solid rgba(191,90,242,0.6); }
         .swatch-green  { background: rgba(48, 209, 88, 0.5);  border: 1px solid rgba(48,209,88,0.6); }
 
+        /* PRICING */
+        .pricing-section {
+            padding: 80px 24px;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .pricing-grid {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 48px;
+        }
+
+        .pricing-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 36px 32px;
+            flex: 1;
+            min-width: 240px;
+            max-width: 320px;
+            text-align: left;
+        }
+
+        .pricing-card.paid {
+            border-color: var(--blue);
+            background: linear-gradient(160deg, #0d1f3c 0%, #1C1C1E 60%);
+        }
+
+        .pricing-tier {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .pricing-card.paid .pricing-tier {
+            color: var(--blue);
+        }
+
+        .pricing-amount {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 4px;
+        }
+
+        .pricing-note {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-top: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .pricing-features li {
+            font-size: 15px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pricing-features li::before {
+            content: "✓";
+            color: var(--green);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .pricing-features li.highlight {
+            color: var(--text);
+            font-weight: 500;
+        }
+
         /* FOOTER */
         footer {
             padding: 60px 24px;
@@ -407,6 +493,15 @@
             font-weight: 600;
             color: var(--text);
             margin-bottom: 8px;
+        }
+
+        footer a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            color: var(--text);
         }
 
         /* DIVIDER */
@@ -447,7 +542,7 @@
                     <div class="tile-value">45d 3h</div>
                 </div>
                 <div class="tile tile-purple">
-                    <div class="tile-label">Eye Appointment</div>
+                    <div class="tile-label">Product Launch</div>
                     <div class="tile-value">12d 6h</div>
                 </div>
                 <div class="tile tile-green">
@@ -513,6 +608,35 @@
     </div>
 </section>
 
+<!-- PRICING -->
+<section class="pricing-section">
+    <p class="section-label">Pricing</p>
+    <h2 class="section-title">Free to start. <span style="color:var(--blue)">One-time unlock.</span></h2>
+    <div class="pricing-grid">
+        <div class="pricing-card">
+            <div class="pricing-tier">Free</div>
+            <div class="pricing-amount">$0</div>
+            <div class="pricing-note">No subscription, ever</div>
+            <ul class="pricing-features">
+                <li>1 countdown event</li>
+                <li>Apple Watch scrollable tiles</li>
+                <li>Watch face complication</li>
+                <li>Arrival celebration &amp; confetti</li>
+                <li>HRV stress encouragement</li>
+            </ul>
+        </div>
+        <div class="pricing-card paid">
+            <div class="pricing-tier">Unlimited</div>
+            <div class="pricing-amount">$2.99</div>
+            <div class="pricing-note">One-time in-app purchase</div>
+            <ul class="pricing-features">
+                <li>Everything in Free</li>
+                <li class="highlight">Unlimited countdown events</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
 <!-- HRV / STRESS SECTION -->
 <section class="hrv-section">
     <div style="text-align:center; margin-bottom:56px;">
@@ -539,8 +663,8 @@
             <p>When your HRV dips, iCountdownClock gently reminds you of what you're looking forward to — turning a stressful moment into a reason for optimism.</p>
             <div class="notification-mockup good">
                 <div class="notif-app">iCountdownClock</div>
-                <strong>Take a breath. ✨</strong><br>
-                Summer Vacation is only 45 days away. You've got this.
+                <strong>Take a breath.</strong><br>
+                You've got this. Summer Vacation in 45 days. 
             </div>
         </div>
     </div>
@@ -550,6 +674,13 @@
 <footer>
     <div class="footer-title">iCountdownClock</div>
     <p>For iPhone and Apple Watch &nbsp;·&nbsp; Requires iOS 17 and watchOS 10</p>
+    <p style="margin-top: 16px;">
+        <a href="mailto:countdownclockapp@gmail.com">Contact</a>
+        &nbsp;·&nbsp;
+        <a href="iCountdownClockSupport.html">Support</a>
+        &nbsp;·&nbsp;
+        <a href="iCountdownClockPrivacy.html">Privacy Policy</a>
+    </p>
     <p style="margin-top: 12px;">© 2026 Laure Chipman. All rights reserved.</p>
 </footer>
 

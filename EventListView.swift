@@ -2,7 +2,10 @@ import SwiftUI
 
 struct EventListView: View {
     @StateObject private var store = EventStore()
+    @EnvironmentObject private var purchaseManager: PurchaseManager
+
     @State private var isPresentingAdd = false
+    @State private var isPresentingPaywall = false
     @State private var editedEvent: Event?
 
     var body: some View {
@@ -42,7 +45,7 @@ struct EventListView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
-                        isPresentingAdd = true
+                        addTapped()
                     } label: {
                         Image(systemName: "plus")
                     }
@@ -64,10 +67,33 @@ struct EventListView: View {
                     onNominate: { store.nominate($0) }
                 )
             }
+            .sheet(isPresented: $isPresentingPaywall) {
+                PaywallView {
+                    // Called after the paywall dismisses on successful purchase.
+                    // Small delay lets the paywall sheet fully close before
+                    // the add-event sheet opens.
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        isPresentingAdd = true
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Private
+
+    private func addTapped() {
+        // Free tier: allow only one event at a time.
+        // Purchased: unlimited.
+        if !purchaseManager.isUnlocked && store.events.count >= 1 {
+            isPresentingPaywall = true
+        } else {
+            isPresentingAdd = true
         }
     }
 }
 
 #Preview {
     EventListView()
+        .environmentObject(PurchaseManager())
 }

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iCountdownClock — Privacy Policy</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --blue: #0A84FF;
+            --bg: #000000;
+            --surface: #1C1C1E;
+            --border: #38383A;
+            --text: #FFFFFF;
+            --text-secondary: #AEAEB2;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+            line-height: 1.7;
+        }
+
+        header {
+            padding: 48px 24px 32px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        header a {
+            font-size: 14px;
+            color: var(--blue);
+            text-decoration: none;
+        }
+
+        header a:hover { text-decoration: underline; }
+
+        header h1 {
+            font-size: clamp(32px, 6vw, 52px);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-top: 12px;
+        }
+
+        header p {
+            margin-top: 8px;
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        main {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 60px 24px 80px;
+        }
+
+        section {
+            margin-bottom: 48px;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-top: 12px;
+        }
+
+        p:first-of-type { margin-top: 0; }
+
+        ul {
+            padding-left: 20px;
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        li {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        strong {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .highlight-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-top: 16px;
+        }
+
+        .highlight-box p {
+            margin-top: 0;
+        }
+
+        a {
+            color: var(--blue);
+            text-decoration: none;
+        }
+
+        a:hover { text-decoration: underline; }
+
+        footer {
+            text-align: center;
+            padding: 32px 24px;
+            border-top: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        footer a { color: var(--text-secondary); text-decoration: none; }
+        footer a:hover { color: var(--text); }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html">← iCountdownClock</a>
+    <h1>Privacy Policy</h1>
+    <p>Effective date: February 2026</p>
+</header>
+
+<main>
+
+    <section>
+        <h2>Overview</h2>
+        <p>iCountdownClock ("the app") is designed with your privacy as a priority. The app does not collect, transmit, or store any personal data on external servers. All information you enter and all health data the app accesses remains on your personal devices.</p>
+    </section>
+
+    <section>
+        <h2>Data We Do Not Collect</h2>
+        <p>iCountdownClock does not collect, transmit, sell, or share any of your data with third parties. Specifically:</p>
+        <ul>
+            <li>No personal information is sent to any server.</li>
+            <li>No analytics, tracking, or advertising SDKs are used.</li>
+            <li>No account or login is required.</li>
+            <li>Your event data never leaves your iPhone and Apple Watch.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Health Data — Heart Rate Variability (HRV)</h2>
+        <div class="highlight-box">
+            <p>iCountdownClock requests access to <strong>Heart Rate Variability (HRV)</strong> data from Apple HealthKit. This data is read from your Apple Watch's sensors and is used solely to power the app's stress-encouragement feature: when a low HRV reading is detected, the app sends you a local notification referencing one of your upcoming events.</p>
+        </div>
+        <p>Your HRV data is:</p>
+        <ul>
+            <li><strong>Read only</strong> — the app reads HRV values from HealthKit and does not write data back.</li>
+            <li><strong>Never transmitted</strong> — HRV data is processed entirely on-device and is never sent to any server, third party, or external service.</li>
+            <li><strong>Never used for advertising</strong> — health and fitness data is not used for advertising, data mining, or any purpose other than the in-app feature described above.</li>
+        </ul>
+        <p>You can grant or revoke HealthKit access at any time in <strong>Settings → Health → Data Access &amp; Devices → iCountdownClock</strong> on your iPhone. Revoking access disables the HRV encouragement feature but does not affect any other app functionality.</p>
+    </section>
+
+    <section>
+        <h2>Event Data</h2>
+        <p>The event names and dates you enter are stored locally using Apple's standard on-device storage (UserDefaults and App Groups shared between your iPhone and Apple Watch). This data is synced between your iPhone and Apple Watch via WatchConnectivity, a direct device-to-device communication framework provided by Apple. It does not pass through any external server.</p>
+    </section>
+
+    <section>
+        <h2>In-App Purchases</h2>
+        <p>iCountdownClock offers an optional one-time in-app purchase to unlock unlimited events. All payment processing is handled entirely by Apple through the App Store. iCountdownClock does not receive, store, or have access to any payment or financial information.</p>
+    </section>
+
+    <section>
+        <h2>Children's Privacy</h2>
+        <p>iCountdownClock does not knowingly collect any information from children. The app does not collect personal information from any user.</p>
+    </section>
+
+    <section>
+        <h2>Changes to This Policy</h2>
+        <p>If this privacy policy changes in the future, the updated policy will be posted at this URL with a revised effective date.</p>
+    </section>
+
+    <section>
+        <h2>Contact</h2>
+        <p>If you have any questions about this privacy policy, please contact:</p>
+        <p><a href="mailto:countdownclockapp@gmail.com">countdownclockapp@gmail.com</a></p>
+    </section>
+
+</main>
+
+<footer>
+    <p>
+        <a href="index.html">Home</a>
+        &nbsp;·&nbsp;
+        <a href="iCountdownClockSupport.html">Support</a>
+        &nbsp;·&nbsp;
+        <a href="mailto:countdownclockapp@gmail.com">Contact</a>
+    </p>
+    <p style="margin-top:10px;">© 2026 Laure Chipman. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

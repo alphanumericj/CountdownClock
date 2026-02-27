@@ -1,0 +1,15 @@
+# Claude working directory (worktrees, session data)
+.claude/
+
+# Xcode user-specific files
+*.xcbkptlist
+xcuserdata/
+*.xcuserstate
+CountdownClock.xcodeproj/xcuserdata/
+
+# macOS
+.DS_Store
+
+# Swift build artifacts
+.build/
+DerivedData/

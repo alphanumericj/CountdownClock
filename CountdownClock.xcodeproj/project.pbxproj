@@ -13,6 +13,7 @@
 		934F5A412F0332D0005823F6 /* EventListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934F5A402F0332D0005823F6 /* EventListView.swift */; };
 		935E47B62F4D24FA0053BA9C /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934F5A3A2F0332C2005823F6 /* Event.swift */; };
 		935E47B72F4D24FA0053BA9C /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934F5A3A2F0332C2005823F6 /* Event.swift */; };
+		935E47C12F5214E90053BA9C /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 935E47C02F5214E90053BA9C /* StoreKit.framework */; };
 		9386CE9D2EE3747B00511539 /* CountdownClock Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 9386CE9C2EE3747B00511539 /* CountdownClock Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		9386CEBA2EE385B100511539 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9386CEB92EE385B100511539 /* WidgetKit.framework */; };
 		9386CEBC2EE385B100511539 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9386CEBB2EE385B100511539 /* SwiftUI.framework */; };
@@ -66,6 +67,7 @@
 		934F5A3C2F0332CA005823F6 /* EventStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventStore.swift; sourceTree = "<group>"; };
 		934F5A3E2F0332CB005823F6 /* EventEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventEditorView.swift; sourceTree = "<group>"; };
 		934F5A402F0332D0005823F6 /* EventListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventListView.swift; sourceTree = "<group>"; };
+		935E47C02F5214E90053BA9C /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.2.sdk/System/Library/Frameworks/StoreKit.framework; sourceTree = DEVELOPER_DIR; };
 		9386CE8C2EE3747A00511539 /* CountdownClock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CountdownClock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9386CE9C2EE3747B00511539 /* CountdownClock Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CountdownClock Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9386CEB72EE385B100511539 /* CountdownWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CountdownWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -110,6 +112,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				935E47C12F5214E90053BA9C /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -161,6 +164,7 @@
 		9386CEB82EE385B100511539 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				935E47C02F5214E90053BA9C /* StoreKit.framework */,
 				9386CEB92EE385B100511539 /* WidgetKit.framework */,
 				9386CEBB2EE385B100511539 /* SwiftUI.framework */,
 			);
