@@ -4,8 +4,9 @@ import WidgetKit
 @MainActor
 final class EventStore: ObservableObject {
     @Published var events: [Event] = [] {
-        didSet { save() }
+        didSet { if !isLoading { save() } }
     }
+    private var isLoading = false
 
     private let storageKey = "events.v1"
     private let appGroup = "group.com.chipmania.CountdownClock"
@@ -61,13 +62,29 @@ final class EventStore: ObservableObject {
         } catch {}
     }
 
+    func restore(_ restored: [Event]) {
+        isLoading = true
+        events = restored
+        isLoading = false
+        save()
+        notifyWatchIfNeeded()
+    }
+
     private func load() {
+        isLoading = true
+        defer { isLoading = false }
         let shared = UserDefaults(suiteName: appGroup)
-        if let data = shared?.data(forKey: storageKey),
-           let decoded = try? JSONDecoder().decode([Event].self, from: data) {
-            events = decoded
-        } else {
-            events = []
+        guard let data = shared?.data(forKey: storageKey) else {
+            print("EventStore.load: no data found for key '\(storageKey)'")
+            return
+        }
+        print("EventStore.load: found \(data.count) bytes")
+        do {
+            events = try JSONDecoder().decode([Event].self, from: data)
+            print("EventStore.load: decoded \(events.count) events OK")
+        } catch {
+            print("EventStore.load: DECODE FAILED — \(error)")
+            // Do NOT overwrite storage — leave corrupt data for investigation
         }
     }
 

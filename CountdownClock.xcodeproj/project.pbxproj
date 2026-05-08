@@ -14,6 +14,11 @@
 		935E47B62F4D24FA0053BA9C /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934F5A3A2F0332C2005823F6 /* Event.swift */; };
 		935E47B72F4D24FA0053BA9C /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934F5A3A2F0332C2005823F6 /* Event.swift */; };
 		935E47C12F5214E90053BA9C /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 935E47C02F5214E90053BA9C /* StoreKit.framework */; };
+		935E77912FAE789A00A9818B /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9386CEB92EE385B100511539 /* WidgetKit.framework */; };
+		935E77922FAE789A00A9818B /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9386CEBB2EE385B100511539 /* SwiftUI.framework */; };
+		935E77A12FAE789B00A9818B /* PhoneCountdownWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 935E77902FAE789A00A9818B /* PhoneCountdownWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		935E77A82FAE7A8A00A9818B /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934F5A3A2F0332C2005823F6 /* Event.swift */; };
+		935E77EA2FAE87A700A9818B /* AppIntents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 935E77E92FAE87A700A9818B /* AppIntents.framework */; };
 		9386CE9D2EE3747B00511539 /* CountdownClock Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 9386CE9C2EE3747B00511539 /* CountdownClock Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		9386CEBA2EE385B100511539 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9386CEB92EE385B100511539 /* WidgetKit.framework */; };
 		9386CEBC2EE385B100511539 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9386CEBB2EE385B100511539 /* SwiftUI.framework */; };
@@ -21,6 +26,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		935E779F2FAE789B00A9818B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9386CE842EE3747A00511539 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 935E778F2FAE789A00A9818B;
+			remoteInfo = PhoneCountdownWidgetExtension;
+		};
 		9386CE9E2EE3747B00511539 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9386CE842EE3747A00511539 /* Project object */;
@@ -38,6 +50,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		935E77A22FAE789B00A9818B /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				935E77A12FAE789B00A9818B /* PhoneCountdownWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9386CEAF2EE3747B00511539 /* Embed Watch Content */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -68,6 +91,9 @@
 		934F5A3E2F0332CB005823F6 /* EventEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventEditorView.swift; sourceTree = "<group>"; };
 		934F5A402F0332D0005823F6 /* EventListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventListView.swift; sourceTree = "<group>"; };
 		935E47C02F5214E90053BA9C /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.2.sdk/System/Library/Frameworks/StoreKit.framework; sourceTree = DEVELOPER_DIR; };
+		935E77902FAE789A00A9818B /* PhoneCountdownWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = PhoneCountdownWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		935E77A72FAE78C300A9818B /* PhoneCountdownWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PhoneCountdownWidgetExtension.entitlements; sourceTree = "<group>"; };
+		935E77E92FAE87A700A9818B /* AppIntents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppIntents.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.2.sdk/System/Library/Frameworks/AppIntents.framework; sourceTree = DEVELOPER_DIR; };
 		9386CE8C2EE3747A00511539 /* CountdownClock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CountdownClock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9386CE9C2EE3747B00511539 /* CountdownClock Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CountdownClock Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9386CEB72EE385B100511539 /* CountdownWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CountdownWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -77,6 +103,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		935E77A52FAE789B00A9818B /* Exceptions for "PhoneCountdownWidget" folder in "PhoneCountdownWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 935E778F2FAE789A00A9818B /* PhoneCountdownWidgetExtension */;
+		};
 		9386CEC82EE385B200511539 /* Exceptions for "CountdownWidget" folder in "CountdownWidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -87,6 +120,14 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		935E77932FAE789A00A9818B /* PhoneCountdownWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				935E77A52FAE789B00A9818B /* Exceptions for "PhoneCountdownWidget" folder in "PhoneCountdownWidgetExtension" target */,
+			);
+			path = PhoneCountdownWidget;
+			sourceTree = "<group>";
+		};
 		9386CE8E2EE3747A00511539 /* CountdownClock */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = CountdownClock;
@@ -108,6 +149,16 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		935E778D2FAE789A00A9818B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				935E77922FAE789A00A9818B /* SwiftUI.framework in Frameworks */,
+				935E77912FAE789A00A9818B /* WidgetKit.framework in Frameworks */,
+				935E77EA2FAE87A700A9818B /* AppIntents.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9386CE892EE3747A00511539 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -138,10 +189,12 @@
 		9386CE832EE3747A00511539 = {
 			isa = PBXGroup;
 			children = (
+				935E77A72FAE78C300A9818B /* PhoneCountdownWidgetExtension.entitlements */,
 				93DB4F4C2EF4D2DE00E32609 /* CountdownWidgetExtension.entitlements */,
 				9386CE8E2EE3747A00511539 /* CountdownClock */,
 				9386CEA02EE3747B00511539 /* CountdownClock Watch App */,
 				9386CEBD2EE385B100511539 /* CountdownWidget */,
+				935E77932FAE789A00A9818B /* PhoneCountdownWidget */,
 				9386CEB82EE385B100511539 /* Frameworks */,
 				9386CE8D2EE3747A00511539 /* Products */,
 				934F5A3A2F0332C2005823F6 /* Event.swift */,
@@ -157,6 +210,7 @@
 				9386CE8C2EE3747A00511539 /* CountdownClock.app */,
 				9386CE9C2EE3747B00511539 /* CountdownClock Watch App.app */,
 				9386CEB72EE385B100511539 /* CountdownWidgetExtension.appex */,
+				935E77902FAE789A00A9818B /* PhoneCountdownWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -164,6 +218,7 @@
 		9386CEB82EE385B100511539 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				935E77E92FAE87A700A9818B /* AppIntents.framework */,
 				935E47C02F5214E90053BA9C /* StoreKit.framework */,
 				9386CEB92EE385B100511539 /* WidgetKit.framework */,
 				9386CEBB2EE385B100511539 /* SwiftUI.framework */,
@@ -174,6 +229,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		935E778F2FAE789A00A9818B /* PhoneCountdownWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 935E77A62FAE789B00A9818B /* Build configuration list for PBXNativeTarget "PhoneCountdownWidgetExtension" */;
+			buildPhases = (
+				935E778C2FAE789A00A9818B /* Sources */,
+				935E778D2FAE789A00A9818B /* Frameworks */,
+				935E778E2FAE789A00A9818B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				935E77932FAE789A00A9818B /* PhoneCountdownWidget */,
+			);
+			name = PhoneCountdownWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = PhoneCountdownWidgetExtension;
+			productReference = 935E77902FAE789A00A9818B /* PhoneCountdownWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		9386CE8B2EE3747A00511539 /* CountdownClock */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9386CEB02EE3747B00511539 /* Build configuration list for PBXNativeTarget "CountdownClock" */;
@@ -182,11 +259,13 @@
 				9386CE892EE3747A00511539 /* Frameworks */,
 				9386CE8A2EE3747A00511539 /* Resources */,
 				9386CEAF2EE3747B00511539 /* Embed Watch Content */,
+				935E77A22FAE789B00A9818B /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				9386CE9F2EE3747B00511539 /* PBXTargetDependency */,
+				935E77A02FAE789B00A9818B /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				9386CE8E2EE3747A00511539 /* CountdownClock */,
@@ -251,9 +330,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1620;
+				LastSwiftUpdateCheck = 2620;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
+					935E778F2FAE789A00A9818B = {
+						CreatedOnToolsVersion = 26.2;
+					};
 					9386CE8B2EE3747A00511539 = {
 						CreatedOnToolsVersion = 16.2;
 					};
@@ -282,11 +364,19 @@
 				9386CE8B2EE3747A00511539 /* CountdownClock */,
 				9386CE9B2EE3747B00511539 /* CountdownClock Watch App */,
 				9386CEB62EE385B100511539 /* CountdownWidgetExtension */,
+				935E778F2FAE789A00A9818B /* PhoneCountdownWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		935E778E2FAE789A00A9818B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9386CE8A2EE3747A00511539 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -311,6 +401,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		935E778C2FAE789A00A9818B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				935E77A82FAE7A8A00A9818B /* Event.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9386CE882EE3747A00511539 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -341,6 +439,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		935E77A02FAE789B00A9818B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 935E778F2FAE789A00A9818B /* PhoneCountdownWidgetExtension */;
+			targetProxy = 935E779F2FAE789B00A9818B /* PBXContainerItemProxy */;
+		};
 		9386CE9F2EE3747B00511539 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 9386CE9B2EE3747B00511539 /* CountdownClock Watch App */;
@@ -354,6 +457,73 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		935E77A32FAE789B00A9818B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = PhoneCountdownWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_TEAM = W8HSG8975B;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PhoneCountdownWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PhoneCountdownWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chipmania.CountdownClock.PhoneCountdownWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		935E77A42FAE789B00A9818B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = PhoneCountdownWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_TEAM = W8HSG8975B;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PhoneCountdownWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = PhoneCountdownWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chipmania.CountdownClock.PhoneCountdownWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		9386CEAA2EE3747B00511539 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -475,13 +645,14 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "CountdownClock Watch App/CountdownClock Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"CountdownClock Watch App/Preview Content\"";
 				DEVELOPMENT_TEAM = W8HSG8975B;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = CountdownClock;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "We use your Heart Rate Variability (HRV) to detect stress and send encouragement as your event approaches.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "iCountdownClock does not write health data.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.chipmania.CountdownClock;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -507,13 +678,14 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "CountdownClock Watch App/CountdownClock Watch App.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"CountdownClock Watch App/Preview Content\"";
 				DEVELOPMENT_TEAM = W8HSG8975B;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = CountdownClock;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "We use your Heart Rate Variability (HRV) to detect stress and send encouragement as your event approaches.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "iCountdownClock does not write health data.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.chipmania.CountdownClock;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -540,12 +712,13 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = CountdownClock/CountdownClock.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"CountdownClock/Preview Content\"";
 				DEVELOPMENT_TEAM = W8HSG8975B;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = CountdownClock;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -560,9 +733,13 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.chipmania.CountdownClock;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -573,12 +750,13 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = CountdownClock/CountdownClock.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"CountdownClock/Preview Content\"";
 				DEVELOPMENT_TEAM = W8HSG8975B;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = CountdownClock;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -593,9 +771,13 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.chipmania.CountdownClock;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -670,6 +852,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		935E77A62FAE789B00A9818B /* Build configuration list for PBXNativeTarget "PhoneCountdownWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				935E77A32FAE789B00A9818B /* Debug */,
+				935E77A42FAE789B00A9818B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		9386CE872EE3747A00511539 /* Build configuration list for PBXProject "CountdownClock" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

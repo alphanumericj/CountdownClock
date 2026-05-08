@@ -26,6 +26,14 @@ class WatchSessionManager: NSObject, WCSessionDelegate, ObservableObject {
         }
     }
 
+    // Push local events to the phone (used for recovery when phone list is empty)
+    func sendEventsToPhone() {
+        guard WCSession.default.activationState == .activated,
+              WCSession.default.isReachable,
+              let data = try? JSONEncoder().encode(events) else { return }
+        WCSession.default.sendMessage(["watchEventsData": data], replyHandler: nil)
+    }
+
     func session(_ session: WCSession,
                  activationDidCompleteWith activationState: WCSessionActivationState,
                  error: (any Error)?) {}
@@ -63,6 +71,6 @@ class WatchSessionManager: NSObject, WCSessionDelegate, ObservableObject {
     }
 
     func sessionReachabilityDidChange(_ session: WCSession) {
-        print("WCSession reachability changed: \(session.isReachable)")
+        if session.isReachable { sendEventsToPhone() }
     }
 }

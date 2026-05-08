@@ -7,15 +7,37 @@ struct EventListView: View {
     @State private var isPresentingAdd = false
     @State private var isPresentingPaywall = false
     @State private var editedEvent: Event?
+    @State private var restoredCount: Int?
 
     var body: some View {
         NavigationStack {
             List {
+                if store.events.isEmpty {
+                    VStack(spacing: 8) {
+                        Text("No events yet.")
+                            .foregroundStyle(.secondary)
+                        Text("If you have events on your Watch, open CountdownClock there and they'll appear here automatically.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                        if let count = restoredCount {
+                            Text("Restored \(count) event\(count == 1 ? "" : "s") from Watch.")
+                                .font(.caption)
+                                .foregroundStyle(.green)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 20)
+                    .listRowBackground(Color.clear)
+                }
                 ForEach(store.events) { event in
                     Button {
                         editedEvent = event
                     } label: {
-                        HStack {
+                        HStack(spacing: 12) {
+                            Text(event.emoji)
+                                .font(.system(size: 36))
+                                .frame(width: 44)
                             VStack(alignment: .leading) {
                                 Text(event.title)
                                     .font(.headline)
@@ -51,6 +73,13 @@ struct EventListView: View {
                     }
                 }
             }
+            .onAppear {
+                PhoneSessionManager.shared.onEventsReceivedFromWatch = { events in
+                    guard store.events.isEmpty, !events.isEmpty else { return }
+                    store.restore(events)
+                    restoredCount = events.count
+                }
+            }
             .sheet(item: $editedEvent) { event in
                 EventEditorView(
                     event: event,
@@ -69,9 +98,6 @@ struct EventListView: View {
             }
             .sheet(isPresented: $isPresentingPaywall) {
                 PaywallView {
-                    // Called after the paywall dismisses on successful purchase.
-                    // Small delay lets the paywall sheet fully close before
-                    // the add-event sheet opens.
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         isPresentingAdd = true
                     }
@@ -83,8 +109,6 @@ struct EventListView: View {
     // MARK: - Private
 
     private func addTapped() {
-        // Free tier: allow only one event at a time.
-        // Purchased: unlimited.
         if !purchaseManager.isUnlocked && store.events.count >= 1 {
             isPresentingPaywall = true
         } else {

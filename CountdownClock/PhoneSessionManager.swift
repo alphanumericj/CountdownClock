@@ -3,6 +3,7 @@ import WatchConnectivity
 
 class PhoneSessionManager: NSObject, WCSessionDelegate {
     static let shared = PhoneSessionManager()
+    var onEventsReceivedFromWatch: (([Event]) -> Void)?
     private override init() {}
 
     func startSession() {
@@ -31,6 +32,15 @@ class PhoneSessionManager: NSObject, WCSessionDelegate {
                  activationDidCompleteWith activationState: WCSessionActivationState,
                  error: Error?) {
         print("Phone WCSession activated: \(activationState.rawValue), error: \(String(describing: error))")
+    }
+
+    // Receive events pushed proactively from the watch app
+    func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
+        guard let data = message["watchEventsData"] as? Data,
+              let events = try? JSONDecoder().decode([Event].self, from: data) else { return }
+        DispatchQueue.main.async {
+            self.onEventsReceivedFromWatch?(events)
+        }
     }
 
     func sessionDidBecomeInactive(_ session: WCSession) {}
