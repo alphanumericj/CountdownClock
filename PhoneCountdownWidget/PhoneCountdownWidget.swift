@@ -27,16 +27,20 @@ func moodColor(for targetDate: Date, relativeTo ref: Date = .now) -> Color {
     return             Color(red: 0.31, green: 0.23, blue: 0.60)           // casual lavender (31+ d)
 }
 
-// Short form for small widget — ref lets timeline pre-compute correctly
+// Short form for small widget — uses calendar-aware formatter so month counts match the medium widget
+private let shortFormatter: DateComponentsFormatter = {
+    let f = DateComponentsFormatter()
+    f.maximumUnitCount = 2
+    f.unitsStyle = .abbreviated
+    f.allowedUnits = [.year, .month, .day, .hour, .minute]
+    return f
+}()
+
 private func countdownText(to date: Date, ref: Date = .now) -> String {
     if date <= ref { return "Now!" }
-    let c = Calendar.current.dateComponents([.day, .hour, .minute], from: ref, to: date)
-    let days = c.day ?? 0; let hours = c.hour ?? 0; let minutes = c.minute ?? 0
-    if days > 365 { return "\(days / 365)y \(days % 365 / 30)mo" }
-    if days > 30  { return "\(days / 30)mo \(days % 30)d" }
-    if days > 0   { return "\(days)d \(hours)h" }
-    if hours > 0  { return "\(hours)h \(minutes)m" }
-    return "\(minutes)m"
+    let effectiveRef = date.timeIntervalSince(ref) >= 86400
+        ? Calendar.current.startOfDay(for: ref) : ref
+    return shortFormatter.string(from: effectiveRef, to: date) ?? "?"
 }
 
 // Full-word form for medium widget: "2 hours, 40 minutes"
@@ -50,7 +54,9 @@ private let fullFormatter: DateComponentsFormatter = {
 
 private func fullCountdownText(to date: Date, ref: Date = .now) -> String {
     if date <= ref { return "Now!" }
-    return fullFormatter.string(from: ref, to: date) ?? countdownText(to: date, ref: ref)
+    let effectiveRef = date.timeIntervalSince(ref) >= 86400
+        ? Calendar.current.startOfDay(for: ref) : ref
+    return fullFormatter.string(from: effectiveRef, to: date) ?? countdownText(to: date, ref: ref)
 }
 
 private let defaultColor = Color(red: 0.28, green: 0.56, blue: 0.90)

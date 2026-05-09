@@ -124,7 +124,9 @@ struct EventTileView: View {
 
     private func countdownText(from start: Date, to end: Date) -> String {
         if start >= end { return "now!" }
-        let c = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: start, to: end)
+        let effectiveStart = end.timeIntervalSince(start) >= 86400
+            ? Calendar.current.startOfDay(for: start) : start
+        let c = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: effectiveStart, to: end)
         if let y = c.year, y > 0 {
             let m = c.month ?? 0
             return "\(y)yr \(m)mo"
