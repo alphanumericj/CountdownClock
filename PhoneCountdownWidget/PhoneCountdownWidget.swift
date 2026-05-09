@@ -14,22 +14,23 @@ private func loadEvents() -> [Event] {
     return events.sorted { $0.targetDate < $1.targetDate }
 }
 
-func moodColor(for date: Date) -> Color {
-    let days = Calendar.current.dateComponents([.day], from: .now, to: date).day ?? 0
-    switch days {
-    case ..<0:   return Color(red: 0.20, green: 0.78, blue: 0.35)
-    case 0:      return Color(red: 0.98, green: 0.75, blue: 0.05)
-    case 1...7:  return Color(red: 0.98, green: 0.48, blue: 0.10)
-    case 8...30: return Color(red: 0.95, green: 0.68, blue: 0.10)
-    default:     return Color(red: 0.28, green: 0.56, blue: 0.90)
-    }
+// Pass `relativeTo` so color is computed for the entry's point in time, not .now at render.
+func moodColor(for targetDate: Date, relativeTo ref: Date = .now) -> Color {
+    let seconds = targetDate.timeIntervalSince(ref)
+    guard seconds > 0 else { return Color(red: 0.20, green: 0.78, blue: 0.35) }  // past: green
+    let hours = seconds / 3600.0
+    if hours < 1    { return Color(red: 0.73, green: 0.84, blue: 0.42) }  // yellow-green (< 1 h)
+    if hours < 5    { return Color(red: 0.96, green: 0.70, blue: 0.15) }  // eggnog     (< 5 h)
+    if hours < 24   { return Color(red: 0.92, green: 0.46, blue: 0.08) }  // exotic mushroom (< 24 h)
+    if hours < 192  { return Color(red: 0.86, green: 0.07, blue: 0.05) }  // mild red   (1–7 d)
+    if hours < 744  { return Color(red: 0.71, green: 0.13, blue: 0.37) }  // wild flower (8–30 d)
+    return             Color(red: 0.31, green: 0.23, blue: 0.60)           // casual lavender (31+ d)
 }
 
-// Short form for small widget
-private func countdownText(to date: Date) -> String {
-    let now = Date.now
-    if date <= now { return "Today!" }
-    let c = Calendar.current.dateComponents([.day, .hour, .minute], from: now, to: date)
+// Short form for small widget — ref lets timeline pre-compute correctly
+private func countdownText(to date: Date, ref: Date = .now) -> String {
+    if date <= ref { return "Now!" }
+    let c = Calendar.current.dateComponents([.day, .hour, .minute], from: ref, to: date)
     let days = c.day ?? 0; let hours = c.hour ?? 0; let minutes = c.minute ?? 0
     if days > 365 { return "\(days / 365)y \(days % 365 / 30)mo" }
     if days > 30  { return "\(days / 30)mo \(days % 30)d" }
@@ -47,10 +48,9 @@ private let fullFormatter: DateComponentsFormatter = {
     return f
 }()
 
-private func fullCountdownText(to date: Date) -> String {
-    let now = Date.now
-    if date <= now { return "Today! 🎉" }
-    return fullFormatter.string(from: now, to: date) ?? countdownText(to: date)
+private func fullCountdownText(to date: Date, ref: Date = .now) -> String {
+    if date <= ref { return "Now!" }
+    return fullFormatter.string(from: ref, to: date) ?? countdownText(to: date, ref: ref)
 }
 
 private let defaultColor = Color(red: 0.28, green: 0.56, blue: 0.90)
@@ -74,7 +74,7 @@ struct AdvanceEventIntent: AppIntent {
 // MARK: - Timeline
 
 struct PhoneCountdownEntry: TimelineEntry {
-    let date: Date
+    let date: Date       // the point in time this entry represents
     let events: [Event]
     let displayIndex: Int
 
@@ -104,22 +104,42 @@ struct PhoneCountdownProvider: TimelineProvider {
         let safeIndex = events.isEmpty ? 0 : stored % events.count
         let now       = Date.now
 
-        // Generate entries at intervals matched to how soon the nearest event is,
-        // so the small widget text stays accurate.
+        // Regular interval entries — frequency based on nearest event
         let soonest = events.first?.targetDate.timeIntervalSince(now) ?? .infinity
         let (step, count): (TimeInterval, Int) = {
             switch soonest {
-            case ..<3600:   return (60,   60)   // < 1 h  → every minute for 1 h
-            case ..<86400:  return (900,  48)   // < 1 d  → every 15 min for 12 h
-            default:        return (3600, 24)   // farther → every hour for 24 h
+            case ..<3600:  return (60,   60)  // < 1 h  → every minute for 1 h
+            case ..<86400: return (900,  48)  // < 1 d  → every 15 min for 12 h
+            default:       return (3600, 24)  // farther → every hour for 24 h
             }
         }()
 
-        let entries = (0..<count).map { i in
+        var entries = (0..<count).map { i in
             PhoneCountdownEntry(date: now.addingTimeInterval(Double(i) * step),
                                 events: events,
                                 displayIndex: safeIndex)
         }
+
+        // Add entries at exact event arrival time + color-change thresholds so the
+        // widget snaps to "Now!" and correct background color without waiting for
+        // the next regular interval.
+        for event in events {
+            let specialDates: [Date] = [
+                event.targetDate,                                      // arrival → green
+                event.targetDate.addingTimeInterval(-3_600),           // 1 h out → egg white
+                event.targetDate.addingTimeInterval(-5 * 3_600),       // 5 h out → eggnog
+                event.targetDate.addingTimeInterval(-24 * 3_600),      // 24 h out → exotic mushroom
+                event.targetDate.addingTimeInterval(-7 * 86_400),      // 7 d out → mild red
+                event.targetDate.addingTimeInterval(-30 * 86_400),     // 30 d out → wild flower
+            ]
+            for d in specialDates where d > now {
+                if !entries.contains(where: { abs($0.date.timeIntervalSince(d)) < 60 }) {
+                    entries.append(PhoneCountdownEntry(date: d, events: events, displayIndex: safeIndex))
+                }
+            }
+        }
+
+        entries.sort { $0.date < $1.date }
         completion(Timeline(entries: entries, policy: .atEnd))
     }
 }
@@ -129,42 +149,61 @@ struct PhoneCountdownProvider: TimelineProvider {
 struct SmallCountdownView: View {
     let entry: PhoneCountdownEntry
 
-    private var event: Event? {
-        entry.events.first(where: { $0.isNominated }) ?? entry.events.first
-    }
-
+    // Use entry.date (not .now) so "Now!" triggers exactly when the arrival entry fires.
+    // Smaller font (17 pt) for the .relative case to give "59 minutes, 41 seconds" room to wrap.
     @ViewBuilder
     private func countdownView(for date: Date) -> some View {
-        let style: Font = .system(size: 20, weight: .bold, design: .rounded)
-        if date <= .now {
-            Text("Today! 🎉")
-                .font(style).foregroundStyle(.white)
-        } else if date.timeIntervalSinceNow < 86400 {
+        if date <= entry.date {
+            Text("Now!")
+                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+        } else if date.timeIntervalSince(entry.date) < 86400 {
             Text(date, style: .relative)
-                .font(style).foregroundStyle(.white)
+                .font(.system(size: 17, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
         } else {
-            Text(countdownText(to: date))
-                .font(style).foregroundStyle(.white)
+            Text(countdownText(to: date, ref: entry.date))
+                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
                 .shadow(radius: 1)
         }
     }
 
     var body: some View {
-        if let event {
-            VStack(spacing: 4) {
-                Text(event.emoji)
-                    .font(.system(size: 48))
-                countdownView(for: event.targetDate)
-                Text(event.title)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.90))
-                    .lineLimit(2)
-                    .multilineTextAlignment(.center)
+        if let event = entry.displayEvent {
+            VStack(spacing: 0) {
+                VStack(spacing: 3) {
+                    Text(event.emoji)
+                        .font(.system(size: 46))
+                    countdownView(for: event.targetDate)
+                    Text(event.title)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.90))
+                        .lineLimit(2)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                if entry.events.count > 1 {
+                    HStack {
+                        Spacer()
+                        Button(intent: AdvanceEventIntent()) {
+                            Image(systemName: "chevron.down.circle.fill")
+                                .font(.system(size: 20))
+                                .foregroundStyle(.white.opacity(0.75))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.bottom, 8)
+                }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .containerBackground(for: .widget) { moodColor(for: event.targetDate) }
+            .containerBackground(for: .widget) {
+                moodColor(for: event.targetDate, relativeTo: entry.date)
+            }
         } else {
             Text("Open iCountdown Clock to add an event")
                 .font(.caption)
@@ -181,23 +220,25 @@ struct SmallCountdownView: View {
 struct MediumCountdownView: View {
     let entry: PhoneCountdownEntry
 
-    // Live-updating for < 24 h (where every minute matters);
-    // full-word custom text for ≥ 24 h (hourly timeline refresh is accurate enough).
     @ViewBuilder
     private func countdownView(for date: Date) -> some View {
         let style: Font = .system(size: 26, weight: .bold, design: .rounded)
-        if date <= .now {
-            Text("Today! 🎉")
+        if date <= entry.date {
+            Text("Now!")
                 .font(style).foregroundStyle(.white)
-        } else if date.timeIntervalSinceNow < 86400 {
+        } else if date.timeIntervalSince(entry.date) < 86400 {
+            // Live-updating for < 24 h; .relative stops at "0 seconds" but we intercept
+            // before it reaches zero via the arrival timeline entry above.
             Text(date, style: .relative)
                 .font(style).foregroundStyle(.white)
-                .lineLimit(2).fixedSize(horizontal: false, vertical: true)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
         } else {
-            Text(fullCountdownText(to: date))
+            Text(fullCountdownText(to: date, ref: entry.date))
                 .font(style).foregroundStyle(.white)
                 .shadow(color: .black.opacity(0.15), radius: 1)
-                .lineLimit(2).fixedSize(horizontal: false, vertical: true)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 
@@ -241,7 +282,9 @@ struct MediumCountdownView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .containerBackground(for: .widget) { moodColor(for: event.targetDate) }
+            .containerBackground(for: .widget) {
+                moodColor(for: event.targetDate, relativeTo: entry.date)
+            }
         } else {
             Text("Open iCountdown Clock to add events")
                 .font(.caption)

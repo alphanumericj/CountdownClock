@@ -1,4 +1,5 @@
 import SwiftUI
+import WatchConnectivity
 
 struct EventListView: View {
     @StateObject private var store = EventStore()
@@ -16,10 +17,12 @@ struct EventListView: View {
                     VStack(spacing: 8) {
                         Text("No events yet.")
                             .foregroundStyle(.secondary)
-                        Text("If you have events on your Watch, open CountdownClock there and they'll appear here automatically.")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
+                        if WCSession.isSupported() && WCSession.default.isPaired {
+                            Text("If you have events on your Watch, open CountdownClock there and they'll appear here automatically.")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .multilineTextAlignment(.center)
+                        }
                         if let count = restoredCount {
                             Text("Restored \(count) event\(count == 1 ? "" : "s") from Watch.")
                                 .font(.caption)
