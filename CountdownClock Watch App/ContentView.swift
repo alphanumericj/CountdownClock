@@ -82,7 +82,7 @@ struct EventTileView: View {
 
             HStack {
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(event.title)
+                    Text("\(event.emoji) \(event.title)")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
