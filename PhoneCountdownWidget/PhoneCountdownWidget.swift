@@ -32,13 +32,17 @@ private let shortFormatter: DateComponentsFormatter = {
     let f = DateComponentsFormatter()
     f.maximumUnitCount = 2
     f.unitsStyle = .abbreviated
-    f.allowedUnits = [.year, .month, .day, .hour, .minute]
+    f.allowedUnits = [.year, .month, .day, .hour]
+    f.zeroFormattingBehavior = .dropLeading
     return f
 }()
 
 private func countdownText(to date: Date, ref: Date = .now) -> String {
     if date <= ref { return "Now!" }
-    let effectiveRef = date.timeIntervalSince(ref) >= 86400
+    // Snap to start-of-day only when months appear in output (>= 30 days),
+    // keeping the day count stable all day. Under 30 days the formatter shows
+    // days+hours which must stay live.
+    let effectiveRef = date.timeIntervalSince(ref) >= 30 * 86400
         ? Calendar.current.startOfDay(for: ref) : ref
     return shortFormatter.string(from: effectiveRef, to: date) ?? "?"
 }
@@ -48,13 +52,14 @@ private let fullFormatter: DateComponentsFormatter = {
     let f = DateComponentsFormatter()
     f.maximumUnitCount = 2
     f.unitsStyle = .full
-    f.allowedUnits = [.year, .month, .day, .hour, .minute]
+    f.allowedUnits = [.year, .month, .day, .hour]
+    f.zeroFormattingBehavior = .dropLeading
     return f
 }()
 
 private func fullCountdownText(to date: Date, ref: Date = .now) -> String {
     if date <= ref { return "Now!" }
-    let effectiveRef = date.timeIntervalSince(ref) >= 86400
+    let effectiveRef = date.timeIntervalSince(ref) >= 30 * 86400
         ? Calendar.current.startOfDay(for: ref) : ref
     return fullFormatter.string(from: effectiveRef, to: date) ?? countdownText(to: date, ref: ref)
 }
@@ -114,9 +119,10 @@ struct PhoneCountdownProvider: TimelineProvider {
         let soonest = events.first?.targetDate.timeIntervalSince(now) ?? .infinity
         let (step, count): (TimeInterval, Int) = {
             switch soonest {
-            case ..<3600:  return (60,   60)  // < 1 h  → every minute for 1 h
-            case ..<86400: return (900,  48)  // < 1 d  → every 15 min for 12 h
-            default:       return (3600, 24)  // farther → every hour for 24 h
+            case ..<3600:           return (60,   60)   // < 1 h  → every minute for 1 h
+            case ..<86400:          return (900,  48)   // < 1 d  → every 15 min for 12 h
+            case ..<(30 * 86400):   return (900,  96)   // < 30 d → every 15 min for 24 h (days+hours stays fresh)
+            default:                return (3600, 24)   // farther → every hour for 24 h
             }
         }()
 
@@ -164,6 +170,7 @@ struct SmallCountdownView: View {
                 .font(.system(size: 20, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
         } else if date.timeIntervalSince(entry.date) < 86400 {
+            // Live-updating for < 24 hours — .relative shows "X hours, Y minutes" live.
             Text(date, style: .relative)
                 .font(.system(size: 17, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
@@ -233,8 +240,7 @@ struct MediumCountdownView: View {
             Text("Now!")
                 .font(style).foregroundStyle(.white)
         } else if date.timeIntervalSince(entry.date) < 86400 {
-            // Live-updating for < 24 h; .relative stops at "0 seconds" but we intercept
-            // before it reaches zero via the arrival timeline entry above.
+            // Live-updating for < 24 hours — .relative shows "X hours, Y minutes" live.
             Text(date, style: .relative)
                 .font(style).foregroundStyle(.white)
                 .lineLimit(2)

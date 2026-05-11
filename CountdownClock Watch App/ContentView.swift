@@ -124,25 +124,21 @@ struct EventTileView: View {
 
     private func countdownText(from start: Date, to end: Date) -> String {
         if start >= end { return "now!" }
-        let effectiveStart = end.timeIntervalSince(start) >= 86400
+        let effectiveStart = end.timeIntervalSince(start) >= 30 * 86400
             ? Calendar.current.startOfDay(for: start) : start
-        let c = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: effectiveStart, to: end)
-        if let y = c.year, y > 0 {
-            let m = c.month ?? 0
-            return "\(y)yr \(m)mo"
-        } else if let m = c.month, m > 0 {
-            let d = c.day ?? 0
-            return "\(m)mo \(d)d"
-        } else if let d = c.day, d > 0 {
-            let h = c.hour ?? 0
-            return "\(d)d \(h)h"
-        } else if let h = c.hour, h > 0 {
-            let min = c.minute ?? 0
-            return "\(h)h \(min)m"
-        } else {
-            let min = c.minute ?? 0
-            return "\(min)m"
-        }
+        let c = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: effectiveStart, to: end)
+        let yr = c.year ?? 0
+        let mo = c.month ?? 0
+        let d  = c.day ?? 0
+        let h  = c.hour ?? 0
+        let m  = c.minute ?? 0
+        let s  = c.second ?? 0
+        if yr > 0 { return "\(yr)yr \(mo)mo" }
+        if mo > 0 { return "\(mo)mo \(d)d" }
+        if d  > 0 { return "\(d)d \(h)h" }
+        if h  > 0 { return "\(h)h \(m)m" }
+        if m  > 0 { return "\(m)m \(s)s" }
+        return "now!"
     }
 }
 
