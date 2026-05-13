@@ -116,17 +116,14 @@ struct PhoneCountdownProvider: TimelineProvider {
         let safeIndex = events.isEmpty ? 0 : stored % events.count
         let now       = Date.now
 
-        // Regular interval entries — frequency based on nearest event.
-        // Pre-computed text is only as fresh as the entry interval, so entries
-        // must be dense enough that the displayed unit never looks stale.
+        // .relative text updates live — entries only needed for "Now!" snap and
+        // mood-color background transitions, not for text freshness.
         let soonest = events.first?.targetDate.timeIntervalSince(now) ?? .infinity
         let (step, count): (TimeInterval, Int) = {
             switch soonest {
-            case ..<120:            return (5,    24)   // < 2 min → every 5 sec  (min+sec accurate)
-            case ..<3600:           return (60,   60)   // < 1 h   → every minute (hr+min accurate)
-            case ..<86400:          return (300, 288)   // < 24 h  → every 5 min  (hr+min ±5 min)
-            case ..<(30 * 86400):   return (900,  96)   // < 30 d  → every 15 min (d+hr ±15 min)
-            default:                return (3600,  24)  // farther → every hour   (mo+d, stable)
+            case ..<3600:  return (60,  60)   // < 1 h  → every minute (fine-grained Now! snap)
+            case ..<86400: return (900, 48)   // < 24 h → every 15 min
+            default:       return (3600, 24)  // farther → every hour
             }
         }()
 
@@ -174,12 +171,12 @@ struct SmallCountdownView: View {
                 .font(.system(size: 20, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
         } else {
-            Text(countdownText(to: date, ref: entry.date))
+            Text(date, style: .relative)
                 .font(.system(size: 17, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
-                .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
+                .lineLimit(3)
+                .minimumScaleFactor(0.7)
         }
     }
 
@@ -238,11 +235,11 @@ struct MediumCountdownView: View {
             Text("Now!")
                 .font(style).foregroundStyle(.white)
         } else {
-            Text(fullCountdownText(to: date, ref: entry.date))
+            Text(date, style: .relative)
                 .font(style).foregroundStyle(.white)
                 .shadow(color: .black.opacity(0.15), radius: 1)
-                .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
+                .lineLimit(3)
+                .minimumScaleFactor(0.7)
         }
     }
 
