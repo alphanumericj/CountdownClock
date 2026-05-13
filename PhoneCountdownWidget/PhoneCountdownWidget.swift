@@ -137,15 +137,21 @@ struct PhoneCountdownProvider: TimelineProvider {
         // widget snaps to "Now!" and correct background color without waiting for
         // the next regular interval.
         for event in events {
-            let specialDates: [Date] = [
-                event.targetDate,                                      // arrival → green
-                event.targetDate.addingTimeInterval(-3_600),           // 1 h out → egg white
+            // Arrival entry is always added unconditionally — deduplication would
+            // allow a regular entry up to 60 s early to stand in, leaving .relative
+            // counting upward ("5 seconds ago") instead of flipping to "Now!" on time.
+            if event.targetDate > now {
+                entries.append(PhoneCountdownEntry(date: event.targetDate, events: events, displayIndex: safeIndex))
+            }
+
+            let thresholdDates: [Date] = [
+                event.targetDate.addingTimeInterval(-3_600),           // 1 h out → yellow-green
                 event.targetDate.addingTimeInterval(-5 * 3_600),       // 5 h out → eggnog
                 event.targetDate.addingTimeInterval(-24 * 3_600),      // 24 h out → exotic mushroom
                 event.targetDate.addingTimeInterval(-7 * 86_400),      // 7 d out → mild red
                 event.targetDate.addingTimeInterval(-30 * 86_400),     // 30 d out → wild flower
             ]
-            for d in specialDates where d > now {
+            for d in thresholdDates where d > now {
                 if !entries.contains(where: { abs($0.date.timeIntervalSince(d)) < 60 }) {
                     entries.append(PhoneCountdownEntry(date: d, events: events, displayIndex: safeIndex))
                 }
