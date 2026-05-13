@@ -107,7 +107,7 @@ struct EventTileView: View {
             onNotify()
             Task {
                 await NotificationManager.shared.scheduleEventArrivalNotification(
-                    eventTitle: event.title
+                    eventTitle: event.title, eventID: event.id
                 )
             }
         }
@@ -116,7 +116,7 @@ struct EventTileView: View {
             onNotify()
             Task {
                 await NotificationManager.shared.scheduleEventArrivalNotification(
-                    eventTitle: event.title
+                    eventTitle: event.title, eventID: event.id
                 )
             }
         }

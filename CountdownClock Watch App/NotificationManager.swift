@@ -10,24 +10,57 @@ final class NotificationManager {
         if !granted { throw NSError(domain: "Notification", code: 1, userInfo: [NSLocalizedDescriptionKey: "Notifications not authorized"]) }
     }
 
-    func scheduleEventArrivalNotification(eventTitle: String) async {
+    // Called from ContentView when the app is in the foreground and detects arrival.
+    // Uses a stable identifier so it can't stack with the pre-scheduled notification.
+    func scheduleEventArrivalNotification(eventTitle: String, eventID: UUID) async {
         let center = UNUserNotificationCenter.current()
 
         let content = UNMutableNotificationContent()
         content.title = "WooHoo!!"
         content.body = "\(eventTitle) is here!"
         content.sound = .default
-        // Category triggers the custom notification interface on the watch
         content.categoryIdentifier = "arrival"
-        // Pass event title so NotificationController can display it in the custom view
         content.userInfo = ["eventTitle": eventTitle]
 
-        // Fire immediately — by the time we detect arrival the target date is already past
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
-        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
+        let identifier = "arrival-\(eventID.uuidString)"
+        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
         do {
             try await center.add(request)
         } catch {}
+    }
+
+    // Called whenever the events list changes. Cancels any existing arrival notifications
+    // and schedules one at the exact targetDate for each future event, so "WooHoo!" fires
+    // from the background even if the watch app is never opened.
+    func scheduleArrivalNotifications(for events: [Event]) async {
+        let center = UNUserNotificationCenter.current()
+
+        // Cancel all pending arrival notifications before rescheduling
+        let pending = await center.pendingNotificationRequests()
+        let oldIDs = pending.filter { $0.identifier.hasPrefix("arrival-") }.map(\.identifier)
+        center.removePendingNotificationRequests(withIdentifiers: oldIDs)
+
+        let now = Date()
+        for event in events {
+            let timeInterval = event.targetDate.timeIntervalSince(now)
+            guard timeInterval > 0 else { continue }
+
+            let content = UNMutableNotificationContent()
+            content.title = "WooHoo!!"
+            content.body = "\(event.title) is here!"
+            content.sound = .default
+            content.categoryIdentifier = "arrival"
+            content.userInfo = ["eventTitle": event.title]
+
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInterval, repeats: false)
+            let request = UNNotificationRequest(
+                identifier: "arrival-\(event.id.uuidString)",
+                content: content,
+                trigger: trigger
+            )
+            try? await center.add(request)
+        }
     }
         
     func scheduleEncouragement(eventTitle: String, timeRemaining: String, messages: [String]) async {

@@ -16,6 +16,8 @@ class WatchSessionManager: NSObject, WCSessionDelegate, ObservableObject {
         if let data = shared?.data(forKey: storageKey),
            let decoded = try? JSONDecoder().decode([Event].self, from: data) {
             events = decoded
+            // Re-schedule arrival notifications in case they were cleared (e.g. app reinstall)
+            Task { await NotificationManager.shared.scheduleArrivalNotifications(for: decoded) }
         }
 
         // Start WatchConnectivity session
@@ -65,6 +67,9 @@ class WatchSessionManager: NSObject, WCSessionDelegate, ObservableObject {
 
             // Refresh watch face complications
             WidgetCenter.shared.reloadAllTimelines()
+
+            // Schedule/reschedule arrival notifications for all future events
+            Task { await NotificationManager.shared.scheduleArrivalNotifications(for: decoded) }
 
             print("Received \(decoded.count) events from phone")
         }
