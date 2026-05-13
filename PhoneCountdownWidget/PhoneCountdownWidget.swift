@@ -170,14 +170,26 @@ struct SmallCountdownView: View {
                 .font(.system(size: 20, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
         } else if date.timeIntervalSince(entry.date) < 86400 {
-            // Live-updating for < 24 hours — .relative shows "X hours, Y minutes" live.
+            // < 24 h: fully live via .relative ("X hours, Y minutes")
             Text(date, style: .relative)
                 .font(.system(size: 17, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
                 .fixedSize(horizontal: false, vertical: true)
+        } else if date.timeIntervalSince(entry.date) < 30 * 86400 {
+            // 1–30 days: static day count (refreshes every 15 min via timeline) +
+            // live sub-day hours via .relative so hours never go stale between entries.
+            let days = Calendar.current.dateComponents([.day], from: entry.date, to: date).day ?? 1
+            let subDayAnchor = Calendar.current.date(byAdding: .day, value: -days, to: date) ?? date
+            (Text("\(days)d ") + Text(subDayAnchor, style: .relative))
+                .font(.system(size: 17, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
         } else {
+            // ≥ 30 days: pre-computed months+days (stable all day via start-of-day snap)
             Text(countdownText(to: date, ref: entry.date))
                 .font(.system(size: 20, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
@@ -240,12 +252,24 @@ struct MediumCountdownView: View {
             Text("Now!")
                 .font(style).foregroundStyle(.white)
         } else if date.timeIntervalSince(entry.date) < 86400 {
-            // Live-updating for < 24 hours — .relative shows "X hours, Y minutes" live.
+            // < 24 h: fully live via .relative ("X hours, Y minutes")
             Text(date, style: .relative)
                 .font(style).foregroundStyle(.white)
                 .lineLimit(2)
                 .fixedSize(horizontal: false, vertical: true)
+        } else if date.timeIntervalSince(entry.date) < 30 * 86400 {
+            // 1–30 days: static day count + live sub-day hours via .relative.
+            // "15 days, " is pre-computed; the hours portion updates in real time.
+            let days = Calendar.current.dateComponents([.day], from: entry.date, to: date).day ?? 1
+            let subDayAnchor = Calendar.current.date(byAdding: .day, value: -days, to: date) ?? date
+            let dayLabel = days == 1 ? "1 day, " : "\(days) days, "
+            (Text(dayLabel) + Text(subDayAnchor, style: .relative))
+                .font(style).foregroundStyle(.white)
+                .shadow(color: .black.opacity(0.15), radius: 1)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
         } else {
+            // ≥ 30 days: pre-computed months+days (stable all day via start-of-day snap)
             Text(fullCountdownText(to: date, ref: entry.date))
                 .font(style).foregroundStyle(.white)
                 .shadow(color: .black.opacity(0.15), radius: 1)
