@@ -27,12 +27,14 @@ func moodColor(for targetDate: Date, relativeTo ref: Date = .now) -> Color {
     return             Color(red: 0.31, green: 0.23, blue: 0.60)           // casual lavender (31+ d)
 }
 
-// Short form for small widget — uses calendar-aware formatter so month counts match the medium widget
+// Always two adjacent units: yr+mo, mo+d, d+hr, hr+min, or min+sec.
+// zeroFormattingBehavior = .dropLeading suppresses leading zero units so
+// "0 days, 6 hours" becomes "6 hours, 0 minutes" (the next pair down).
 private let shortFormatter: DateComponentsFormatter = {
     let f = DateComponentsFormatter()
     f.maximumUnitCount = 2
     f.unitsStyle = .abbreviated
-    f.allowedUnits = [.year, .month, .day, .hour]
+    f.allowedUnits = [.year, .month, .day, .hour, .minute, .second]
     f.zeroFormattingBehavior = .dropLeading
     return f
 }()
@@ -40,8 +42,7 @@ private let shortFormatter: DateComponentsFormatter = {
 private func countdownText(to date: Date, ref: Date = .now) -> String {
     if date <= ref { return "Now!" }
     // Snap to start-of-day only when months appear in output (>= 30 days),
-    // keeping the day count stable all day. Under 30 days the formatter shows
-    // days+hours which must stay live.
+    // keeping the month+day count stable all day.
     let effectiveRef = date.timeIntervalSince(ref) >= 30 * 86400
         ? Calendar.current.startOfDay(for: ref) : ref
     return shortFormatter.string(from: effectiveRef, to: date) ?? "?"
@@ -52,7 +53,7 @@ private let fullFormatter: DateComponentsFormatter = {
     let f = DateComponentsFormatter()
     f.maximumUnitCount = 2
     f.unitsStyle = .full
-    f.allowedUnits = [.year, .month, .day, .hour]
+    f.allowedUnits = [.year, .month, .day, .hour, .minute, .second]
     f.zeroFormattingBehavior = .dropLeading
     return f
 }()
@@ -65,13 +66,6 @@ private func fullCountdownText(to date: Date, ref: Date = .now) -> String {
 }
 
 private let defaultColor = Color(red: 0.28, green: 0.56, blue: 0.90)
-
-// Strip seconds (and sub-seconds) from a date so Text(.relative) never shows
-// sub-minute granularity — e.g. "6 hours, 30 minutes" not "6 hours, 30 minutes, 45 seconds".
-private func truncatedToMinute(_ date: Date) -> Date {
-    let comps = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date)
-    return Calendar.current.date(from: comps) ?? date
-}
 
 // MARK: - App Intent
 
@@ -122,14 +116,17 @@ struct PhoneCountdownProvider: TimelineProvider {
         let safeIndex = events.isEmpty ? 0 : stored % events.count
         let now       = Date.now
 
-        // Regular interval entries — frequency based on nearest event
+        // Regular interval entries — frequency based on nearest event.
+        // Pre-computed text is only as fresh as the entry interval, so entries
+        // must be dense enough that the displayed unit never looks stale.
         let soonest = events.first?.targetDate.timeIntervalSince(now) ?? .infinity
         let (step, count): (TimeInterval, Int) = {
             switch soonest {
-            case ..<3600:           return (60,   60)   // < 1 h  → every minute for 1 h
-            case ..<86400:          return (900,  48)   // < 1 d  → every 15 min for 12 h
-            case ..<(30 * 86400):   return (900,  96)   // < 30 d → every 15 min for 24 h (days+hours stays fresh)
-            default:                return (3600, 24)   // farther → every hour for 24 h
+            case ..<120:            return (5,    24)   // < 2 min → every 5 sec  (min+sec accurate)
+            case ..<3600:           return (60,   60)   // < 1 h   → every minute (hr+min accurate)
+            case ..<86400:          return (300, 288)   // < 24 h  → every 5 min  (hr+min ±5 min)
+            case ..<(30 * 86400):   return (900,  96)   // < 30 d  → every 15 min (d+hr ±15 min)
+            default:                return (3600,  24)  // farther → every hour   (mo+d, stable)
             }
         }()
 
@@ -176,33 +173,13 @@ struct SmallCountdownView: View {
             Text("Now!")
                 .font(.system(size: 20, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
-        } else if date.timeIntervalSince(entry.date) < 86400 {
-            // < 24 h: fully live via .relative ("X hours, Y minutes")
-            Text(date, style: .relative)
-                .font(.system(size: 17, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-                .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
-        } else if date.timeIntervalSince(entry.date) < 30 * 86400 {
-            // 1–30 days: static day count (refreshes every 15 min via timeline) +
-            // live sub-day hours via .relative so hours never go stale between entries.
-            // Truncate target to whole minutes so .relative never shows seconds.
-            let target = truncatedToMinute(date)
-            let days = Calendar.current.dateComponents([.day], from: entry.date, to: target).day ?? 1
-            let subDayAnchor = Calendar.current.date(byAdding: .day, value: -days, to: target) ?? target
-            (Text("\(days)d ") + Text(subDayAnchor, style: .relative))
-                .font(.system(size: 17, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-                .multilineTextAlignment(.center)
-                .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
         } else {
-            // ≥ 30 days: pre-computed months+days (stable all day via start-of-day snap)
             Text(countdownText(to: date, ref: entry.date))
-                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .font(.system(size: 17, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
-                .shadow(radius: 1)
+                .multilineTextAlignment(.center)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 
@@ -260,27 +237,7 @@ struct MediumCountdownView: View {
         if date <= entry.date {
             Text("Now!")
                 .font(style).foregroundStyle(.white)
-        } else if date.timeIntervalSince(entry.date) < 86400 {
-            // < 24 h: fully live via .relative ("X hours, Y minutes")
-            Text(date, style: .relative)
-                .font(style).foregroundStyle(.white)
-                .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
-        } else if date.timeIntervalSince(entry.date) < 30 * 86400 {
-            // 1–30 days: static day count + live sub-day hours via .relative.
-            // "15 days, " is pre-computed; the hours portion updates in real time.
-            // Truncate target to whole minutes so .relative never shows seconds.
-            let target = truncatedToMinute(date)
-            let days = Calendar.current.dateComponents([.day], from: entry.date, to: target).day ?? 1
-            let subDayAnchor = Calendar.current.date(byAdding: .day, value: -days, to: target) ?? target
-            let dayLabel = days == 1 ? "1 day, " : "\(days) days, "
-            (Text(dayLabel) + Text(subDayAnchor, style: .relative))
-                .font(style).foregroundStyle(.white)
-                .shadow(color: .black.opacity(0.15), radius: 1)
-                .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
         } else {
-            // ≥ 30 days: pre-computed months+days (stable all day via start-of-day snap)
             Text(fullCountdownText(to: date, ref: entry.date))
                 .font(style).foregroundStyle(.white)
                 .shadow(color: .black.opacity(0.15), radius: 1)
