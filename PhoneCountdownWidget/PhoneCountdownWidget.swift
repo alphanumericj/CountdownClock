@@ -66,6 +66,13 @@ private func fullCountdownText(to date: Date, ref: Date = .now) -> String {
 
 private let defaultColor = Color(red: 0.28, green: 0.56, blue: 0.90)
 
+// Strip seconds (and sub-seconds) from a date so Text(.relative) never shows
+// sub-minute granularity — e.g. "6 hours, 30 minutes" not "6 hours, 30 minutes, 45 seconds".
+private func truncatedToMinute(_ date: Date) -> Date {
+    let comps = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+    return Calendar.current.date(from: comps) ?? date
+}
+
 // MARK: - App Intent
 
 struct AdvanceEventIntent: AppIntent {
@@ -180,8 +187,10 @@ struct SmallCountdownView: View {
         } else if date.timeIntervalSince(entry.date) < 30 * 86400 {
             // 1–30 days: static day count (refreshes every 15 min via timeline) +
             // live sub-day hours via .relative so hours never go stale between entries.
-            let days = Calendar.current.dateComponents([.day], from: entry.date, to: date).day ?? 1
-            let subDayAnchor = Calendar.current.date(byAdding: .day, value: -days, to: date) ?? date
+            // Truncate target to whole minutes so .relative never shows seconds.
+            let target = truncatedToMinute(date)
+            let days = Calendar.current.dateComponents([.day], from: entry.date, to: target).day ?? 1
+            let subDayAnchor = Calendar.current.date(byAdding: .day, value: -days, to: target) ?? target
             (Text("\(days)d ") + Text(subDayAnchor, style: .relative))
                 .font(.system(size: 17, weight: .bold, design: .rounded))
                 .foregroundStyle(.white)
@@ -260,8 +269,10 @@ struct MediumCountdownView: View {
         } else if date.timeIntervalSince(entry.date) < 30 * 86400 {
             // 1–30 days: static day count + live sub-day hours via .relative.
             // "15 days, " is pre-computed; the hours portion updates in real time.
-            let days = Calendar.current.dateComponents([.day], from: entry.date, to: date).day ?? 1
-            let subDayAnchor = Calendar.current.date(byAdding: .day, value: -days, to: date) ?? date
+            // Truncate target to whole minutes so .relative never shows seconds.
+            let target = truncatedToMinute(date)
+            let days = Calendar.current.dateComponents([.day], from: entry.date, to: target).day ?? 1
+            let subDayAnchor = Calendar.current.date(byAdding: .day, value: -days, to: target) ?? target
             let dayLabel = days == 1 ? "1 day, " : "\(days) days, "
             (Text(dayLabel) + Text(subDayAnchor, style: .relative))
                 .font(style).foregroundStyle(.white)
