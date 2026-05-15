@@ -103,13 +103,10 @@ struct EventTileView: View {
             .padding(.vertical, 8)
         }
         .onAppear {
-            guard hasArrived, !hasNotified else { return }
-            onNotify()
-            Task {
-                await NotificationManager.shared.scheduleEventArrivalNotification(
-                    eventTitle: event.title, eventID: event.id
-                )
-            }
+            // Mark tile as notified if already arrived, but don't fire a notification —
+            // the scheduled UNTimeIntervalNotificationTrigger handles the background case,
+            // and firing here would repeat "WooHoo!" every time the app is opened.
+            if hasArrived, !hasNotified { onNotify() }
         }
         .onChange(of: hasArrived) { _, arrived in
             guard arrived, !hasNotified else { return }
