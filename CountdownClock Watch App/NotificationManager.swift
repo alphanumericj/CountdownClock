@@ -4,6 +4,29 @@ import UserNotifications
 final class NotificationManager {
     static let shared = NotificationManager()
 
+    private let appGroup = "group.com.chipmania.CountdownClock"
+    private let notifiedKey = "notifiedArrivalEventIDs"
+
+    // MARK: - Persistent notified-ID tracking
+
+    private func persistedNotifiedIDs() -> Set<String> {
+        let arr = UserDefaults(suiteName: appGroup)?.stringArray(forKey: notifiedKey) ?? []
+        return Set(arr)
+    }
+
+    private func markNotified(_ id: UUID) {
+        var current = persistedNotifiedIDs()
+        current.insert(id.uuidString)
+        UserDefaults(suiteName: appGroup)?.set(Array(current), forKey: notifiedKey)
+    }
+
+    // Prune notified IDs for events that no longer exist, so storage doesn't grow forever.
+    func pruneNotifiedIDs(keepingEventIDs activeIDs: Set<UUID>) {
+        let active = Set(activeIDs.map(\.uuidString))
+        let pruned = persistedNotifiedIDs().filter { active.contains($0) }
+        UserDefaults(suiteName: appGroup)?.set(Array(pruned), forKey: notifiedKey)
+    }
+
     func requestAuthorization() async throws {
         let center = UNUserNotificationCenter.current()
         let granted = try await center.requestAuthorization(options: [.alert, .sound, .badge])
@@ -13,8 +36,10 @@ final class NotificationManager {
     // Called from ContentView when the app is in the foreground and detects arrival.
     // Uses a stable identifier so it can't stack with the pre-scheduled notification.
     func scheduleEventArrivalNotification(eventTitle: String, eventID: UUID) async {
-        let center = UNUserNotificationCenter.current()
+        guard !persistedNotifiedIDs().contains(eventID.uuidString) else { return }
+        markNotified(eventID)
 
+        let center = UNUserNotificationCenter.current()
         let content = UNMutableNotificationContent()
         content.title = "WooHoo!!"
         content.body = "\(eventTitle) is here!"
@@ -42,7 +67,15 @@ final class NotificationManager {
         center.removePendingNotificationRequests(withIdentifiers: oldIDs)
 
         let now = Date()
+        let alreadyNotified = persistedNotifiedIDs()
+
+        // Prune IDs for events that no longer exist
+        pruneNotifiedIDs(keepingEventIDs: Set(events.map(\.id)))
+
         for event in events {
+            // Never re-notify an event that already got a WooHoo!
+            guard !alreadyNotified.contains(event.id.uuidString) else { continue }
+
             let timeInterval = event.targetDate.timeIntervalSince(now)
             guard timeInterval > 0 else { continue }
 
@@ -59,7 +92,10 @@ final class NotificationManager {
                 content: content,
                 trigger: trigger
             )
-            try? await center.add(request)
+            do {
+                try await center.add(request)
+                markNotified(event.id)  // persisted so this event is never re-notified
+            } catch {}
         }
     }
         
